@@ -157,6 +157,13 @@ install_packages() {
                     echo "$package already installed"
                 fi
             done
+            
+            if ! command -v opencode &> /dev/null; then
+                echo "Installing opencode..."
+                curl -fsSL https://opencode.ai/install | bash
+            else
+                echo "opencode already installed"
+            fi
             ;;
             
         ubuntu)
@@ -214,6 +221,13 @@ install_packages() {
                 sudo apt update
                 sudo apt install -y wezterm
             fi
+            
+            if ! command -v opencode &> /dev/null; then
+                echo "Installing opencode..."
+                curl -fsSL https://opencode.ai/install | bash
+            else
+                echo "opencode already installed"
+            fi
             ;;
             
         arch)
@@ -228,6 +242,13 @@ install_packages() {
                     echo "$package already installed"
                 fi
             done
+            
+            if ! command -v opencode &> /dev/null; then
+                echo "Installing opencode..."
+                curl -fsSL https://opencode.ai/install | bash
+            else
+                echo "opencode already installed"
+            fi
             ;;
             
         *)
@@ -242,6 +263,7 @@ install_packages() {
             echo "  - fd"
             echo "  - thefuck"
             echo "  - wezterm"
+            echo "  - opencode"
             read -p "Press enter to continue with dotfiles setup..."
             ;;
     esac
@@ -332,22 +354,6 @@ copy_dotfiles() {
     else
         echo "Creating ~/.zshrc and adding source line..."
         echo "source ~/.config/zshrc/zshrc_extra" > ~/.zshrc
-    fi
-    
-    echo "Copying bashrc config to ~/.config/bashrc/..."
-    mkdir -p ~/.config/bashrc
-    cp -r .config/bashrc/ ~/.config/
-    
-    if [ -f ~/.bashrc ]; then
-        if ! grep -q "source ~/.config/bashrc/bashrc_extra" ~/.bashrc; then
-            echo "Adding source line to ~/.bashrc..."
-            echo "" >> ~/.bashrc
-            echo "source ~/.config/bashrc/bashrc_extra" >> ~/.bashrc
-        else
-            echo "Source line already exists in ~/.bashrc, skipping..."
-        fi
-    else
-        echo "~/.bashrc does not exist, skipping source line addition..."
     fi
     
     echo "Copying yazi config to ~/.config/yazi/..."
