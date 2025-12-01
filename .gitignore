@@ -1,0 +1,22 @@
+
+# Not needed dirs from .config
+gh/
+gh-copilot/
+github-copilot/
+.config/github-copilot/**
+.config/github-copilot/
+.config/github-copilot
+htop/
+btop/
+iterm2/
+opencode/
+yarn/
+
+# Personal configurations
+.config/nvim/lua/user/plugins/dap-config.lua
+.config/gh/
+
+# Sensitive files
+.gitconfig
+*_history
+*.log

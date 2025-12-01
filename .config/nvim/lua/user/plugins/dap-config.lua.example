@@ -1,0 +1,84 @@
+-- DAP Configuration Example
+-- Copy this file to dap-config.lua and customize for your projects
+-- The dap-config.lua file is gitignored to keep personal/work configurations private
+
+-- This module should return a table with your custom DAP configurations
+-- Example structure:
+
+local M = {}
+
+-- Helper function to get Python path (same as in dap.lua)
+local python_path = function()
+	local venv_path = vim.fn.getcwd() .. "/.venv/bin/python"
+	if vim.fn.filereadable(venv_path) == 1 then
+		return venv_path
+	end
+
+	local handle = io.popen("poetry env info -p 2>/dev/null")
+	if handle then
+		local result = handle:read("*a")
+		handle:close()
+		result = result:gsub("%s+", "")
+		if result ~= "" and vim.fn.isdirectory(result) == 1 then
+			return result .. "/bin/python"
+		end
+	end
+
+	return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python"
+end
+
+-- Example Python DAP configurations
+-- Customize these for your specific projects
+M.python = {
+	-- Example: Debug a FastAPI/Flask application
+	{
+		type = "python",
+		request = "launch",
+		name = "Debug: My API Server",
+		module = "my_api_module", -- Replace with your module name
+		args = { "run-api" }, -- Replace with your command arguments
+		console = "integratedTerminal",
+		cwd = "${workspaceFolder}",
+		python = python_path(),
+		env = {
+			-- Add your environment variables here
+			-- AWS_PROFILE = "your-aws-profile",
+			-- MY_APP_CONFIG_PATH = vim.fn.expand("~") .. "/path/to/config",
+			-- MY_APP_LOG_LEVEL = "DEBUG",
+			TZ = "UTC",
+			PYTHONPATH = "${workspaceFolder}",
+		},
+		justMyCode = false,
+	},
+
+	-- Example: Debug a background worker/scheduler
+	{
+		type = "python",
+		request = "launch",
+		name = "Debug: Background Worker",
+		module = "my_worker_module", -- Replace with your module name
+		args = { "start" }, -- Replace with your command arguments
+		console = "integratedTerminal",
+		cwd = "${workspaceFolder}",
+		python = python_path(),
+		env = {
+			TZ = "UTC",
+			PYTHONPATH = "${workspaceFolder}",
+		},
+		justMyCode = false,
+	},
+
+	-- Example: Debug current file
+	{
+		type = "python",
+		request = "launch",
+		name = "Debug: Current File",
+		program = "${file}",
+		console = "integratedTerminal",
+		cwd = "${workspaceFolder}",
+		python = python_path(),
+		justMyCode = false,
+	},
+}
+
+return M
