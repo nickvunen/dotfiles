@@ -43,6 +43,9 @@ opt.splitbelow = true -- split horizontal window to the bottom
 -- turn off swapfile
 opt.swapfile = false
 
+-- session options (required for auto-session to save localoptions like formatoptions, etc.)
+opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+
 -- Python specific settings
 -- vim.g.lazyvim_python_lsp = "pyright"
 -- vim.g.lazyvim_python_ruff = "ruff"
