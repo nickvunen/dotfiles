@@ -269,6 +269,97 @@ install_packages() {
     esac
 }
 
+cleanup_legacy_packer() {
+    echo ""
+    echo "Cleaning up legacy packer directory (migrating to Lazy.nvim)..."
+    
+    PACKER_DIR="$HOME/.local/share/nvim/site/pack/packer"
+    if [ -d "$PACKER_DIR" ]; then
+        echo "Removing legacy packer directory: $PACKER_DIR"
+        rm -rf "$PACKER_DIR"
+        echo "Legacy packer directory removed successfully"
+    else
+        echo "No legacy packer directory found (already clean)"
+    fi
+}
+
+install_neovim_providers() {
+    echo ""
+    echo "Installing Neovim providers..."
+    
+    # Install npm neovim module for Node.js provider
+    if command -v npm &> /dev/null; then
+        if ! npm list -g neovim &> /dev/null; then
+            echo "Installing npm neovim module..."
+            npm install -g neovim
+        else
+            echo "npm neovim module already installed"
+        fi
+    else
+        echo "npm not found. Skipping Node.js provider installation."
+        echo "Install Node.js and npm, then run: npm install -g neovim"
+    fi
+    
+    # Install pip neovim module for Python provider
+    if command -v pip3 &> /dev/null; then
+        if ! pip3 show pynvim &> /dev/null; then
+            echo "Installing pynvim (Python neovim module)..."
+            pip3 install pynvim --user
+        else
+            echo "pynvim (Python neovim module) already installed"
+        fi
+    elif command -v pip &> /dev/null; then
+        if ! pip show pynvim &> /dev/null; then
+            echo "Installing pynvim (Python neovim module)..."
+            pip install pynvim --user
+        else
+            echo "pynvim (Python neovim module) already installed"
+        fi
+    else
+        echo "pip not found. Skipping Python provider installation."
+        echo "Install Python and pip, then run: pip3 install pynvim"
+    fi
+    
+    # Install Ruby neovim module for Ruby provider (optional)
+    if command -v ruby &> /dev/null && command -v gem &> /dev/null; then
+        if ! gem list neovim -i &> /dev/null; then
+            echo "Installing Ruby neovim module..."
+            gem install neovim
+        else
+            echo "Ruby neovim module already installed"
+        fi
+    else
+        echo "Ruby not found. Skipping Ruby provider installation (optional)."
+    fi
+}
+
+install_wget_if_needed() {
+    OS=$(detect_os)
+    echo ""
+    echo "Checking wget installation (required for Mason/tooling)..."
+    
+    if command -v wget &> /dev/null; then
+        echo "wget already installed"
+        return
+    fi
+    
+    echo "Installing wget..."
+    case "$OS" in
+        macos)
+            brew install wget
+            ;;
+        ubuntu)
+            sudo apt install -y wget
+            ;;
+        arch)
+            sudo pacman -S --noconfirm wget
+            ;;
+        *)
+            echo "Unknown OS. Please install wget manually."
+            ;;
+    esac
+}
+
 install_fzf_git() {
     echo ""
     echo "Installing fzf-git.sh..."
@@ -386,6 +477,8 @@ install_packages
 
 install_font
 
+install_wget_if_needed
+
 install_fzf_git
 
 setup_ohmyzsh
@@ -393,6 +486,10 @@ setup_ohmyzsh
 setup_powerlevel10k
 
 copy_dotfiles
+
+cleanup_legacy_packer
+
+install_neovim_providers
 
 echo ""
 echo "=== Setup Complete ==="

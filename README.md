@@ -295,6 +295,59 @@ chmod +x setup-dotfiles.sh
 
 For package installation issues, ensure you have sudo privileges.
 
+### Neovim Deprecation Warnings
+
+**Important**: You may see deprecation warnings when starting Neovim. These are typically caused by plugins using deprecated Neovim APIs and are **non-blocking** — your editor will still work correctly.
+
+**What to do:**
+1. **Update your plugins regularly**: Run `:Lazy update` in Neovim to update all plugins to their latest versions
+2. **Most warnings are harmless**: Deprecation warnings are informational and won't prevent you from using Neovim
+3. **Plugin authors fix these over time**: Most popular plugins get updated to use new APIs
+
+To suppress deprecation warnings temporarily, you can add this to your Neovim config:
+```lua
+vim.deprecate = function() end
+```
+
+**Note**: This is not recommended long-term as it hides useful information about API changes.
+
+### Lua 5.1 for LuaJIT Compatibility (Optional)
+
+Some Neovim plugins or tools (like certain LSP servers) may benefit from having Lua 5.1 or LuaJIT installed. This is **optional** and most users won't need it.
+
+**macOS (Homebrew):**
+```bash
+brew install lua@5.1 luajit
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install lua5.1 luajit
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S lua51 luajit
+```
+
+### Ruby Provider (Optional)
+
+If you use Ruby and want Neovim's Ruby provider:
+```bash
+gem install neovim
+```
+
+The setup script will automatically install this if Ruby is detected on your system.
+
+### Neovim Provider Health Check
+
+To verify all Neovim providers are working correctly, run inside Neovim:
+```vim
+:checkhealth provider
+```
+
+This will show the status of Python, Node.js, Ruby, and other providers.
+
 ## Keyboard Shortcuts
 
 This section documents all custom keyboard shortcuts configured in the dotfiles.
