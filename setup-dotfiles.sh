@@ -289,7 +289,7 @@ install_neovim_providers() {
     
     # Install npm neovim module for Node.js provider
     if command -v npm &> /dev/null; then
-        if ! npm list -g neovim &> /dev/null 2>&1; then
+        if ! npm list -g neovim &> /dev/null; then
             echo "Installing npm neovim module..."
             npm install -g neovim
         else
@@ -302,14 +302,14 @@ install_neovim_providers() {
     
     # Install pip neovim module for Python provider
     if command -v pip3 &> /dev/null; then
-        if ! pip3 show pynvim &> /dev/null 2>&1; then
+        if ! pip3 show pynvim &> /dev/null; then
             echo "Installing pynvim (Python neovim module)..."
             pip3 install pynvim --user
         else
             echo "pynvim (Python neovim module) already installed"
         fi
     elif command -v pip &> /dev/null; then
-        if ! pip show pynvim &> /dev/null 2>&1; then
+        if ! pip show pynvim &> /dev/null; then
             echo "Installing pynvim (Python neovim module)..."
             pip install pynvim --user
         else
@@ -322,7 +322,7 @@ install_neovim_providers() {
     
     # Install Ruby neovim module for Ruby provider (optional)
     if command -v ruby &> /dev/null && command -v gem &> /dev/null; then
-        if ! gem list neovim -i &> /dev/null 2>&1; then
+        if ! gem list neovim -i &> /dev/null; then
             echo "Installing Ruby neovim module..."
             gem install neovim
         else
