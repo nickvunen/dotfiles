@@ -133,6 +133,81 @@ install_font() {
     esac
 }
 
+install_brave() {
+    OS=$(detect_os)
+    echo ""
+    echo "Installing Brave browser..."
+    
+    case "$OS" in
+        macos)
+            if brew list --cask brave-browser &> /dev/null; then
+                echo "Brave browser already installed"
+            else
+                echo "Installing Brave browser with Homebrew..."
+                brew install --cask brave-browser
+                echo "Brave browser installed successfully"
+            fi
+            ;;
+            
+        ubuntu)
+            if command -v brave-browser &> /dev/null; then
+                echo "Brave browser already installed"
+            else
+                echo "Installing Brave browser..."
+                
+                # Add Brave GPG key
+                sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+                
+                # Add Brave repository
+                echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+                
+                # Update and install
+                sudo apt update
+                sudo apt install -y brave-browser
+                
+                echo "Brave browser installed successfully"
+            fi
+            ;;
+            
+        arch)
+            if pacman -Qi brave-bin &> /dev/null; then
+                echo "Brave browser already installed"
+            else
+                echo "Installing Brave browser from AUR..."
+                
+                # Check for AUR helper
+                if command -v yay &> /dev/null; then
+                    yay -S --noconfirm brave-bin
+                    echo "Brave browser installed successfully"
+                elif command -v paru &> /dev/null; then
+                    paru -S --noconfirm brave-bin
+                    echo "Brave browser installed successfully"
+                else
+                    echo "No AUR helper found. Installing yay first..."
+                    
+                    # Install yay
+                    sudo pacman -S --needed --noconfirm base-devel git
+                    (
+                        git clone https://aur.archlinux.org/yay.git /tmp/yay
+                        cd /tmp/yay
+                        makepkg -si --noconfirm
+                    )
+                    rm -rf /tmp/yay
+                    
+                    echo "Installing Brave browser..."
+                    yay -S --noconfirm brave-bin
+                    echo "Brave browser installed successfully"
+                fi
+            fi
+            ;;
+            
+        *)
+            echo "Unknown OS. Please install Brave browser manually:"
+            echo "  - Visit: https://brave.com/download/"
+            ;;
+    esac
+}
+
 install_packages() {
     OS=$(detect_os)
     echo ""
@@ -476,6 +551,8 @@ check_and_switch_to_zsh
 install_packages
 
 install_font
+
+install_brave
 
 install_wget_if_needed
 
