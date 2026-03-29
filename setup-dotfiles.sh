@@ -158,14 +158,14 @@ install_packages() {
                 fi
             done
             
-            if ! command -v opencode &> /dev/null; then
-                echo "Installing opencode..."
-                curl -fsSL https://opencode.ai/install | bash
+            if ! command -v claude &> /dev/null; then
+                echo "Installing Claude Code CLI..."
+                npm install -g @anthropic-ai/claude-code
             else
-                echo "opencode already installed"
+                echo "Claude Code CLI already installed"
             fi
             ;;
-            
+
         ubuntu)
             echo "Installing packages with apt..."
             sudo apt update
@@ -222,14 +222,14 @@ install_packages() {
                 sudo apt install -y wezterm
             fi
             
-            if ! command -v opencode &> /dev/null; then
-                echo "Installing opencode..."
-                curl -fsSL https://opencode.ai/install | bash
+            if ! command -v claude &> /dev/null; then
+                echo "Installing Claude Code CLI..."
+                npm install -g @anthropic-ai/claude-code
             else
-                echo "opencode already installed"
+                echo "Claude Code CLI already installed"
             fi
             ;;
-            
+
         arch)
             echo "Installing packages with pacman..."
             
@@ -243,14 +243,14 @@ install_packages() {
                 fi
             done
             
-            if ! command -v opencode &> /dev/null; then
-                echo "Installing opencode..."
-                curl -fsSL https://opencode.ai/install | bash
+            if ! command -v claude &> /dev/null; then
+                echo "Installing Claude Code CLI..."
+                npm install -g @anthropic-ai/claude-code
             else
-                echo "opencode already installed"
+                echo "Claude Code CLI already installed"
             fi
             ;;
-            
+
         *)
             echo "Unknown OS. Please install packages manually:"
             echo "  - tmux"
@@ -263,7 +263,7 @@ install_packages() {
             echo "  - fd"
             echo "  - thefuck"
             echo "  - wezterm"
-            echo "  - opencode"
+            echo "  - claude (Claude Code CLI)"
             read -p "Press enter to continue with dotfiles setup..."
             ;;
     esac

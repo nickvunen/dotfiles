@@ -34,7 +34,7 @@ The `setup-dotfiles.sh` script performs the following actions:
 
 1. **Detects your OS** and installs packages using the appropriate package manager
 2. **Switches your shell to zsh** if you're currently using bash or another shell
-3. **Installs all required packages** (tmux, neovim, yazi, lazygit, fzf, zoxide, eza, fd, thefuck, wezterm, opencode)
+3. **Installs all required packages** (tmux, neovim, yazi, lazygit, fzf, zoxide, eza, fd, thefuck, wezterm, claude)
 4. **Installs MesloLGS Nerd Font** for proper icon rendering
 5. **Installs fzf-git.sh** for enhanced git integration with fzf
 6. **Sets up Oh My Zsh** with plugins (zsh-autosuggestions, zsh-syntax-highlighting)
@@ -96,7 +96,7 @@ After running the setup script successfully, you should see:
 1. **Shell changed to zsh** - Your default shell will be zsh
 2. **Oh My Zsh installed** - Located at `~/.oh-my-zsh/`
 3. **Powerlevel10k theme active** - Beautiful prompt with git status, etc.
-4. **All CLI tools available** - Run `which tmux nvim yazi lazygit fzf zoxide eza fd thefuck wezterm opencode` to verify
+4. **All CLI tools available** - Run `which tmux nvim yazi lazygit fzf zoxide eza fd thefuck wezterm claude` to verify
 5. **Configuration files in place**:
    - `~/.tmux.conf`
    - `~/.wezterm.lua`
@@ -126,7 +126,7 @@ eza --version
 fd --version
 thefuck --version
 wezterm --version
-opencode --version
+claude --version
 
 # Check Oh My Zsh plugins
 ls ~/.oh-my-zsh/custom/plugins/
@@ -185,12 +185,32 @@ The setup script installs and configures the following tools, organized by categ
 | [eza](https://github.com/eza-community/eza) | Modern replacement for ls |
 | [fd](https://github.com/sharkdp/fd) | Simple, fast alternative to find |
 | [thefuck](https://github.com/nvbn/thefuck) | Magnificent app that corrects previous console commands |
-| [opencode](https://opencode.ai/) | AI coding agent for the terminal |
+| [Claude Code CLI](https://claude.ai/code) | Anthropic's official AI coding agent for the terminal |
 
 ### Fonts
 | Font | Description |
 |------|-------------|
 | [MesloLGS Nerd Font](https://github.com/ryanoasis/nerd-fonts) | Patched font with icons for terminal use |
+
+## Post-Installation Authentication
+
+After running the setup script, two tools require a one-time login.
+
+### GitHub Copilot (Neovim)
+
+Open Neovim and run:
+```vim
+:Copilot auth
+```
+This opens a GitHub authentication flow in your browser. Follow the prompt to authorize the device code.
+
+### Claude Code CLI
+
+Run the following in your terminal:
+```bash
+claude
+```
+On first launch, Claude Code will prompt you to log in with your Anthropic account. Follow the instructions to complete authentication. After that, the `claudecode.nvim` plugin (`:ClaudeCode` / `<leader>ac`) will also work since it uses the same Claude Code CLI under the hood.
 
 ## OS-Specific Installation Notes
 
@@ -202,7 +222,7 @@ The setup script automatically detects your operating system and installs packag
 # Packages installed via: brew install <package>
 brew install tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm
 brew install --cask font-meslo-lg-nerd-font
-# opencode installed via: curl -fsSL https://opencode.ai/install | bash
+# Claude Code CLI installed via: npm install -g @anthropic-ai/claude-code
 ```
 
 ### Ubuntu/Debian (apt)
@@ -217,14 +237,14 @@ sudo apt install tmux neovim fzf fd-find
 # - eza: from gierens repository
 # - thefuck: via pip
 # - wezterm: from wez repository
-# - opencode: via install script (curl -fsSL https://opencode.ai/install | bash)
+# - Claude Code CLI: via npm (npm install -g @anthropic-ai/claude-code)
 ```
 
 ### Arch Linux (pacman)
 ```bash
 # All packages available in official repositories
 sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm ttf-meslo-nerd
-# opencode installed via: curl -fsSL https://opencode.ai/install | bash
+# Claude Code CLI installed via: npm install -g @anthropic-ai/claude-code
 ```
 
 ## Configuration Files
