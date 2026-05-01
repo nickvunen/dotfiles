@@ -158,11 +158,11 @@ install_packages() {
                 fi
             done
             
-            if ! command -v claude &> /dev/null; then
-                echo "Installing Claude Code CLI..."
-                npm install -g @anthropic-ai/claude-code
+            if ! command -v opencode &> /dev/null; then
+                echo "Installing opencode..."
+                curl -fsSL https://opencode.ai/install | bash
             else
-                echo "Claude Code CLI already installed"
+                echo "opencode already installed"
             fi
             ;;
 
@@ -222,11 +222,11 @@ install_packages() {
                 sudo apt install -y wezterm
             fi
             
-            if ! command -v claude &> /dev/null; then
-                echo "Installing Claude Code CLI..."
-                npm install -g @anthropic-ai/claude-code
+            if ! command -v opencode &> /dev/null; then
+                echo "Installing opencode..."
+                curl -fsSL https://opencode.ai/install | bash
             else
-                echo "Claude Code CLI already installed"
+                echo "opencode already installed"
             fi
             ;;
 
@@ -243,11 +243,11 @@ install_packages() {
                 fi
             done
             
-            if ! command -v claude &> /dev/null; then
-                echo "Installing Claude Code CLI..."
-                npm install -g @anthropic-ai/claude-code
+            if ! command -v opencode &> /dev/null; then
+                echo "Installing opencode..."
+                curl -fsSL https://opencode.ai/install | bash
             else
-                echo "Claude Code CLI already installed"
+                echo "opencode already installed"
             fi
             ;;
 
@@ -263,7 +263,7 @@ install_packages() {
             echo "  - fd"
             echo "  - thefuck"
             echo "  - wezterm"
-            echo "  - claude (Claude Code CLI)"
+            echo "  - opencode"
             read -p "Press enter to continue with dotfiles setup..."
             ;;
     esac

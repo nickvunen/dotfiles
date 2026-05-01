@@ -34,7 +34,7 @@ The `setup-dotfiles.sh` script performs the following actions:
 
 1. **Detects your OS** and installs packages using the appropriate package manager
 2. **Switches your shell to zsh** if you're currently using bash or another shell
-3. **Installs all required packages** (tmux, neovim, yazi, lazygit, fzf, zoxide, eza, fd, thefuck, wezterm, claude)
+3. **Installs all required packages** (tmux, neovim, yazi, lazygit, fzf, zoxide, eza, fd, thefuck, wezterm, opencode)
 4. **Installs MesloLGS Nerd Font** for proper icon rendering
 5. **Installs fzf-git.sh** for enhanced git integration with fzf
 6. **Sets up Oh My Zsh** with plugins (zsh-autosuggestions, zsh-syntax-highlighting)
@@ -96,7 +96,7 @@ After running the setup script successfully, you should see:
 1. **Shell changed to zsh** - Your default shell will be zsh
 2. **Oh My Zsh installed** - Located at `~/.oh-my-zsh/`
 3. **Powerlevel10k theme active** - Beautiful prompt with git status, etc.
-4. **All CLI tools available** - Run `which tmux nvim yazi lazygit fzf zoxide eza fd thefuck wezterm claude` to verify
+4. **All CLI tools available** - Run `which tmux nvim yazi lazygit fzf zoxide eza fd thefuck wezterm opencode` to verify
 5. **Configuration files in place**:
    - `~/.tmux.conf`
    - `~/.wezterm.lua`
@@ -126,7 +126,7 @@ eza --version
 fd --version
 thefuck --version
 wezterm --version
-claude --version
+opencode --version
 
 # Check Oh My Zsh plugins
 ls ~/.oh-my-zsh/custom/plugins/
@@ -185,7 +185,7 @@ The setup script installs and configures the following tools, organized by categ
 | [eza](https://github.com/eza-community/eza) | Modern replacement for ls |
 | [fd](https://github.com/sharkdp/fd) | Simple, fast alternative to find |
 | [thefuck](https://github.com/nvbn/thefuck) | Magnificent app that corrects previous console commands |
-| [Claude Code CLI](https://claude.ai/code) | Anthropic's official AI coding agent for the terminal |
+| [opencode](https://opencode.ai/) | AI coding agent for the terminal |
 
 ### Fonts
 | Font | Description |
@@ -204,13 +204,15 @@ Open Neovim and run:
 ```
 This opens a GitHub authentication flow in your browser. Follow the prompt to authorize the device code.
 
-### Claude Code CLI
+### opencode
 
 Run the following in your terminal:
 ```bash
-claude
+opencode auth login
 ```
-On first launch, Claude Code will prompt you to log in with your Anthropic account. Follow the instructions to complete authentication. After that, the `claudecode.nvim` plugin (`:ClaudeCode` / `<leader>ac`) will also work since it uses the same Claude Code CLI under the hood.
+Pick a provider (Anthropic, OpenAI, Amazon Bedrock, etc.) and follow the prompts. Alternatively, pre-configure a provider by creating `~/.config/opencode/opencode.json`. See the [opencode docs](https://opencode.ai/docs) for provider-specific options.
+
+The `opencode.nvim` plugin integrates with Neovim — see `.config/nvim/lua/user/plugins/opencode.lua`. Keybindings use the `<leader>a` prefix.
 
 ## OS-Specific Installation Notes
 
@@ -222,7 +224,7 @@ The setup script automatically detects your operating system and installs packag
 # Packages installed via: brew install <package>
 brew install tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm
 brew install --cask font-meslo-lg-nerd-font
-# Claude Code CLI installed via: npm install -g @anthropic-ai/claude-code
+# opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
 
 ### Ubuntu/Debian (apt)
@@ -237,14 +239,14 @@ sudo apt install tmux neovim fzf fd-find
 # - eza: from gierens repository
 # - thefuck: via pip
 # - wezterm: from wez repository
-# - Claude Code CLI: via npm (npm install -g @anthropic-ai/claude-code)
+# - opencode: via install script (curl -fsSL https://opencode.ai/install | bash)
 ```
 
 ### Arch Linux (pacman)
 ```bash
 # All packages available in official repositories
 sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm ttf-meslo-nerd
-# Claude Code CLI installed via: npm install -g @anthropic-ai/claude-code
+# opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
 
 ## Configuration Files
