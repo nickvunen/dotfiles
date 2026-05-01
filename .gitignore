@@ -20,3 +20,7 @@ yarn/
 .gitconfig
 *_history
 *.log
+
+# AI
+AGENTS.md
+CLAUDE.md
