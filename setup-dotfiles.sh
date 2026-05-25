@@ -170,7 +170,7 @@ install_packages() {
             echo "Installing packages with apt..."
             sudo apt update
             
-            sudo apt install -y tmux neovim fzf fd-find
+            sudo apt install -y tmux neovim fzf fd-find sysstat
             
             if ! command -v yazi &> /dev/null; then
                 echo "Installing yazi..."
@@ -233,7 +233,7 @@ install_packages() {
         arch)
             echo "Installing packages with pacman..."
             
-            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm)
+            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat)
             for package in "${packages[@]}"; do
                 if ! pacman -Qi "$package" &> /dev/null; then
                     echo "Installing $package..."
@@ -267,6 +267,25 @@ install_packages() {
             read -p "Press enter to continue with dotfiles setup..."
             ;;
     esac
+}
+
+setup_tmux_plugins() {
+    echo ""
+    echo "Setting up tmux plugins..."
+    
+    TPM_DIR="$HOME/.tmux/plugins/tpm"
+    
+    if [ ! -d "$TPM_DIR" ]; then
+        echo "Cloning TPM (Tmux Plugin Manager)..."
+        git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
+    else
+        echo "TPM already installed"
+    fi
+    
+    if [ -f "$HOME/.tmux.conf" ] && [ -x "$TPM_DIR/bin/install_plugins" ]; then
+        echo "Installing tmux plugins via TPM..."
+        "$TPM_DIR/bin/install_plugins" || echo "Plugin install hit an issue; run 'prefix + I' inside tmux to retry."
+    fi
 }
 
 cleanup_legacy_packer() {
@@ -486,6 +505,8 @@ setup_ohmyzsh
 setup_powerlevel10k
 
 copy_dotfiles
+
+setup_tmux_plugins
 
 cleanup_legacy_packer
 

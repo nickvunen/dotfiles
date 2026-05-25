@@ -160,6 +160,12 @@ The setup script installs and configures the following tools, organized by categ
 | Tool | Description |
 |------|-------------|
 | [tmux](https://github.com/tmux/tmux) | Terminal multiplexer for managing multiple sessions |
+| [TPM](https://github.com/tmux-plugins/tpm) | Tmux plugin manager (auto-installs plugins from `.tmux.conf`) |
+| [nord-tmux](https://github.com/arcticicestudio/nord-tmux) | Nord color theme for tmux |
+| [tmux-cpu](https://github.com/tmux-plugins/tmux-cpu) | CPU and RAM indicator in status bar |
+| [tmux-weather](https://github.com/xamut/tmux-weather) | Current weather in status bar |
+| [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) | Persist tmux sessions across restarts |
+| [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum) | Auto-save tmux sessions every 15 minutes |
 
 ### Editor
 | Tool | Description |
@@ -230,7 +236,7 @@ brew install --cask font-meslo-lg-nerd-font
 ### Ubuntu/Debian (apt)
 ```bash
 # Core packages installed via apt
-sudo apt install tmux neovim fzf fd-find
+sudo apt install tmux neovim fzf fd-find sysstat
 
 # Additional packages installed from official sources or manually:
 # - yazi: via cargo or direct download
@@ -245,7 +251,7 @@ sudo apt install tmux neovim fzf fd-find
 ### Arch Linux (pacman)
 ```bash
 # All packages available in official repositories
-sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm ttf-meslo-nerd
+sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat ttf-meslo-nerd
 # opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
 
