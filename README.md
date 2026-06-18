@@ -192,6 +192,7 @@ The setup script installs and configures the following tools, organized by categ
 | [fd](https://github.com/sharkdp/fd) | Simple, fast alternative to find |
 | [thefuck](https://github.com/nvbn/thefuck) | Magnificent app that corrects previous console commands |
 | [opencode](https://opencode.ai/) | AI coding agent for the terminal |
+| [ollama](https://ollama.com/) | Run large language models locally |
 
 ### Fonts
 | Font | Description |
@@ -219,6 +220,33 @@ opencode auth login
 Pick a provider (Anthropic, OpenAI, Amazon Bedrock, etc.) and follow the prompts. Alternatively, pre-configure a provider by creating `~/.config/opencode/opencode.json`. See the [opencode docs](https://opencode.ai/docs) for provider-specific options.
 
 The `opencode.nvim` plugin integrates with Neovim — see `.config/nvim/lua/user/plugins/opencode.lua`. Keybindings use the `<leader>a` prefix.
+
+### Ollama
+
+[Ollama](https://ollama.com/) runs LLMs locally. After installation, pull and run a model:
+
+```bash
+# Pull a model (e.g. llama3.2, mistral, qwen2.5-coder)
+ollama pull llama3.2
+
+# Run it interactively
+ollama run llama3.2
+```
+
+**Using Ollama with opencode:** Add it as a provider in `~/.config/opencode/opencode.json`:
+
+```json
+{
+  "providers": {
+    "ollama": {
+      "name": "Ollama",
+      "url": "http://localhost:11434/v1"
+    }
+  }
+}
+```
+
+Then select an Ollama model when running `opencode`. The `ollama serve` daemon must be running (it starts automatically on macOS after install).
 
 ## OS-Specific Installation Notes
 

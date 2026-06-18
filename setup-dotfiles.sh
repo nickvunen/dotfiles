@@ -164,6 +164,13 @@ install_packages() {
             else
                 echo "opencode already installed"
             fi
+            
+            if ! command -v ollama &> /dev/null; then
+                echo "Installing ollama..."
+                brew install ollama
+            else
+                echo "ollama already installed"
+            fi
             ;;
 
         ubuntu)
@@ -228,6 +235,13 @@ install_packages() {
             else
                 echo "opencode already installed"
             fi
+            
+            if ! command -v ollama &> /dev/null; then
+                echo "Installing ollama..."
+                curl -fsSL https://ollama.com/install.sh | sh
+            else
+                echo "ollama already installed"
+            fi
             ;;
 
         arch)
@@ -248,6 +262,13 @@ install_packages() {
                 curl -fsSL https://opencode.ai/install | bash
             else
                 echo "opencode already installed"
+            fi
+            
+            if ! pacman -Qi ollama &> /dev/null; then
+                echo "Installing ollama..."
+                sudo pacman -S --noconfirm ollama
+            else
+                echo "ollama already installed"
             fi
             ;;
 
