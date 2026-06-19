@@ -494,6 +494,13 @@ copy_dotfiles() {
     echo "Copying thefuck config to ~/.config/thefuck/..."
     mkdir -p ~/.config/thefuck
     cp -r .config/thefuck/ ~/.config/
+
+    echo "Copying opencode config to ~/.config/opencode/ (no-clobber)..."
+    mkdir -p ~/.config/opencode
+    # -n preserves any local opencode.json / weave-opencode.json the user has
+    # already created (those files are gitignored — see README "Post-Installation
+    # Authentication" for how to set them up).
+    cp -rn .config/opencode/. ~/.config/opencode/
 }
 
 run_p10k_configure() {

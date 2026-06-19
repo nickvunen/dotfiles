@@ -46,6 +46,7 @@ The `setup-dotfiles.sh` script performs the following actions:
    - `.config/zshrc/` → `~/.config/zshrc/`
    - `.config/yazi/` → `~/.config/yazi/`
    - `.config/thefuck/` → `~/.config/thefuck/`
+   - `.config/opencode/` → `~/.config/opencode/` (no-clobber — preserves your local `opencode.json`)
 9. **Adds source lines** to `~/.zshrc` for extra configurations
 10. **Launches the Powerlevel10k configuration wizard** for prompt customization
 
@@ -104,6 +105,7 @@ After running the setup script successfully, you should see:
    - `~/.config/zshrc/`
    - `~/.config/yazi/`
    - `~/.config/thefuck/`
+   - `~/.config/opencode/` (caveman skills + plugin + agents; your own `opencode.json` is not overwritten)
 6. **MesloLGS Nerd Font installed** - Icons should render correctly in the terminal
 7. **fzf-git.sh available** - Located at `~/.fzf-git.sh`
 
@@ -295,6 +297,7 @@ The repository includes the following configuration files:
 | `.config/zshrc/` | Additional zsh configuration |
 | `.config/yazi/` | Yazi file manager configuration |
 | `.config/thefuck/` | thefuck configuration |
+| `.config/opencode/` | opencode AI agent config — caveman skills, plugin, agent specs. `opencode.json` and `weave-opencode.json` are gitignored (personal model/provider settings). |
 
 ## Optional: Debug Adapter Protocol (DAP) Configuration
 
@@ -620,6 +623,28 @@ Leader key: `Space`
 | `Space+zt` | Visual | Generate tests |
 | `Space+zm` | Normal | Generate commit message |
 | `Space+zs` | Visual | Generate commit for selection |
+
+#### opencode.nvim (AI agent integration)
+
+Leader prefix: `<leader>a` ("a" = AI). Plugin: [opencode.nvim](https://github.com/nickjvandyke/opencode.nvim).
+
+| Shortcut | Mode | Description |
+|----------|------|-------------|
+| `Space+aa` | Normal/Visual | Ask opencode (free-form prompt, includes `@this`) |
+| `Space+as` | Normal/Visual | Select prompt / command / session from picker |
+| `Space+ac` | Normal/Terminal | Toggle opencode TUI window |
+| `Space+an` | Normal | New opencode session |
+| `Space+ai` | Normal | Interrupt current session |
+| `Space+ae` | Normal/Visual | Explain `@this` |
+| `Space+af` | Normal/Visual | Fix `@diagnostics` |
+| `Space+ar` | Normal/Visual | Review `@this` for correctness/readability |
+| `Space+at` | Normal/Visual | Add tests for `@this` |
+| `Space+au` | Normal | Scroll TUI half page up |
+| `Space+ad` | Normal | Scroll TUI half page down |
+| `go{motion}` | Normal/Visual | Append range to opencode (operator + dot-repeat) |
+| `goo` | Normal | Append current line to opencode |
+
+Requires `opencode` CLI on `$PATH`. `<leader>ac` opens the TUI as a right split via `snacks.nvim`. Run `:checkhealth opencode` to verify setup.
 
 #### Surround (nvim-surround)
 | Shortcut | Mode | Description |
