@@ -531,7 +531,7 @@ Leader key: `Space`
 #### LSP (Language Server Protocol)
 | Shortcut | Mode | Description |
 |----------|------|-------------|
-| `gr` | Normal | Show LSP references |
+| `Space+gr` | Normal | Show LSP references (Telescope) |
 | `gD` | Normal | Go to declaration |
 | `gd` | Normal | Show LSP definitions |
 | `gi` | Normal | Show LSP implementations |
@@ -613,20 +613,16 @@ Leader key: `Space`
 | `S` | Normal/Visual/Operator | Flash treesitter |
 | `r` | Operator | Remote flash |
 | `R` | Operator/Visual | Treesitter search |
-| `Ctrl+s` | Command | Toggle flash search |
-
-#### Substitute
-| Shortcut | Mode | Description |
-|----------|------|-------------|
-| `s` | Normal | Substitute with motion |
-| `ss` | Normal | Substitute line |
-| `S` | Normal | Substitute to end of line |
-| `s` | Visual | Substitute in visual mode |
 
 #### Formatting
 | Shortcut | Mode | Description |
 |----------|------|-------------|
 | `Space+mp` | Normal/Visual | Format file or range |
+
+#### Linting
+| Shortcut | Mode | Description |
+|----------|------|-------------|
+| `Space+ll` | Normal | Trigger linting for current file |
 
 #### Copilot
 | Shortcut | Mode | Description |

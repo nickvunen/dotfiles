@@ -1,5 +1,8 @@
+-- Disabled: `s` and `ss` were shadowed by flash.nvim anyway.
+-- Re-enable by setting `enabled = true` if you want the substitute operator back.
 return {
   "gbprod/substitute.nvim",
+  enabled = false,
   event = { "BufReadPre", "BufNewFile" },
   config = function()
     local substitute = require("substitute")

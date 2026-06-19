@@ -31,7 +31,7 @@ return {
 			end,
 		})
 
-		vim.keymap.set("n", "<leader>l", function()
+		vim.keymap.set("n", "<leader>ll", function()
 			require("lint").linters.pylint.cmd = resolve_pylint()
 			lint.try_lint()
 		end, { desc = "Trigger linting for current file" })
