@@ -9,8 +9,15 @@ github-copilot/
 htop/
 btop/
 iterm2/
-opencode/
 yarn/
+
+# opencode: track config, exclude secrets / state / generated
+.config/opencode/opencode.json
+.config/opencode/opencode.json.bak
+.config/opencode/weave-opencode.json
+.config/opencode/.caveman-active
+.config/opencode/node_modules/
+.config/opencode/bun.lock
 
 # Personal configurations
 .config/nvim/lua/user/plugins/dap-config.lua
@@ -24,3 +31,4 @@ yarn/
 # AI
 AGENTS.md
 CLAUDE.md
+!.config/opencode/AGENTS.md
