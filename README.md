@@ -82,6 +82,12 @@ docker run -it --rm archlinux:latest bash -c "
 "
 ```
 
+#### Verify provider notice fires on fresh install
+```bash
+docker run --rm -v "$PWD:/dotfiles" ubuntu:22.04 bash -c \
+  "cd /dotfiles && ./setup-dotfiles.sh 2>&1 | grep -q 'opencode.ai/docs/providers' && echo 'NOTICE OK'"
+```
+
 #### Testing on macOS
 For macOS testing, use a fresh user account or a virtual machine:
 ```bash
@@ -196,6 +202,18 @@ The setup script installs and configures the following tools, organized by categ
 | [opencode](https://opencode.ai/) | AI coding agent for the terminal |
 | [ollama](https://ollama.com/) | Run large language models locally |
 
+### AI / Agents
+| Tool | Description |
+|------|-------------|
+| [opencode](https://opencode.ai/) | AI coding agent for the terminal (also listed above) |
+| AGENTS.md overlay | Caveman compression + C-3PO persona + Weave routing rules for opencode |
+| caveman plugin | opencode plugin for caveman mode tracking |
+| caveman skills (6) | Slash-command skill family: `caveman`, `caveman-commit`, `caveman-compress`, `caveman-help`, `caveman-review`, `caveman-stats` |
+| [Weave](https://github.com/pgermishuys/opencode-weave) (`@opencode_weave/weave`) | Multi-agent orchestration framework for opencode |
+| [Superpowers](https://github.com/obra/superpowers) (`superpowers@git+https://github.com/obra/superpowers.git`) | Skill library for structured AI workflows |
+| tokenscope plugin (`@ramtinj95/opencode-tokenscope`) | Token usage analytics for opencode sessions |
+| wakelock plugin (`opencode-wakelock`) | Prevents system sleep during long opencode sessions |
+
 ### Fonts
 | Font | Description |
 |------|-------------|
@@ -215,11 +233,20 @@ This opens a GitHub authentication flow in your browser. Follow the prompt to au
 
 ### opencode
 
-Run the following in your terminal:
+After install, `~/.config/opencode/opencode.json` is a copy of the shipped template with a placeholder `"provider"` block. Two ways to configure:
+
+**Option A — interactive login** (opencode writes the file for you):
 ```bash
 opencode auth login
 ```
-Pick a provider (Anthropic, OpenAI, Amazon Bedrock, etc.) and follow the prompts. Alternatively, pre-configure a provider by creating `~/.config/opencode/opencode.json`. See the [opencode docs](https://opencode.ai/docs) for provider-specific options.
+Pick a provider (Anthropic, OpenAI, Amazon Bedrock, etc.) and follow the prompts.
+
+**Option B — hand-edit** `~/.config/opencode/opencode.json`:
+Replace the placeholder `provider` block with your chosen provider config (Bedrock, Anthropic, OpenAI, Ollama, etc.). The `_comment_*` keys in the template explain each option inline.
+
+A second file, `~/.config/opencode/weave-opencode.json`, exists separately and configures per-agent model overrides for the [Weave](https://github.com/pgermishuys/opencode-weave) multi-agent framework. Edit it to assign different models to different agents.
+
+The Weave and Superpowers plugins load automatically on first `opencode` launch — fetched via opencode's package system, no manual install needed.
 
 The `opencode.nvim` plugin integrates with Neovim — see `.config/nvim/lua/user/plugins/opencode.lua`. Keybindings use the `<leader>a` prefix.
 

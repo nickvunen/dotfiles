@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pgermishuys/opencode-weave/main/schema/weave-config.schema.json",
+  "_comment": "Replace model values with model IDs you have access to. See https://github.com/pgermishuys/opencode-weave for available keys.",
+  "agents": {
+    "loom": {
+      "model": "<provider/model-id>"
+    },
+    "tapestry": {
+      "model": "<provider/model-id>"
+    },
+    "shuttle": {
+      "model": "<provider/model-id>"
+    },
+    "pattern": {
+      "model": "<provider/model-id>"
+    },
+    "thread": {
+      "model": "<provider/model-id>"
+    },
+    "spindle": {
+      "model": "<provider/model-id>"
+    },
+    "weft": {
+      "model": "<provider/model-id>"
+    },
+    "warp": {
+      "model": "<provider/model-id>"
+    }
+  }
+}

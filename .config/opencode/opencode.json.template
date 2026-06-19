@@ -1,0 +1,26 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "_comment_provider": "You must add your own provider block. See _comment_provider_example for options. Remove these _comment_* keys before use if desired.",
+  "_comment_provider_example": {
+    "amazon-bedrock": {
+      "provider": "amazon-bedrock",
+      "options": {
+        "profile": "<your-aws-profile>",
+        "region": "<your-region>"
+      }
+    },
+    "anthropic": {
+      "provider": "anthropic",
+      "options": {
+        "apiKey": "<your-anthropic-api-key>"
+      }
+    }
+  },
+  "plugin": [
+    "opencode-wakelock",
+    "@ramtinj95/opencode-tokenscope",
+    "./plugins/caveman/plugin.js",
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "@opencode_weave/weave"
+  ]
+}

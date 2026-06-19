@@ -456,6 +456,23 @@ setup_powerlevel10k() {
     fi
 }
 
+copy_if_missing() {
+    local src="$1"
+    local dest="$2"
+    if [ ! -f "$src" ]; then
+        echo "  [ERROR] template not found: $src"
+        return 1
+    fi
+    if [ -e "$dest" ]; then
+        echo "  [skipped] $dest (already exists)"
+    elif cp "$src" "$dest"; then
+        echo "  [created] $dest"
+    else
+        echo "  [ERROR] failed to copy $src -> $dest"
+        return 1
+    fi
+}
+
 copy_dotfiles() {
     echo ""
     echo "Copying dotfiles..."
@@ -501,6 +518,27 @@ copy_dotfiles() {
     # already created (those files are gitignored — see README "Post-Installation
     # Authentication" for how to set them up).
     cp -rn .config/opencode/. ~/.config/opencode/
+    copy_if_missing "$HOME/.config/opencode/opencode.json.template" "$HOME/.config/opencode/opencode.json"
+    copy_if_missing "$HOME/.config/opencode/weave-opencode.json.template" "$HOME/.config/opencode/weave-opencode.json"
+}
+
+check_opencode_provider() {
+    local cfg="$HOME/.config/opencode/opencode.json"
+    if [ -f "$cfg" ] && ! grep -q '"provider"' "$cfg"; then
+        echo ""
+        echo "╔══════════════════════════════════════════════════════════════╗"
+        echo "║          ACTION REQUIRED: opencode provider not set          ║"
+        echo "╠══════════════════════════════════════════════════════════════╣"
+        echo "║  ~/.config/opencode/opencode.json has no \"provider\" key.     ║"
+        echo "║                                                              ║"
+        echo "║  To fix, either:                                             ║"
+        echo "║    opencode auth login                                       ║"
+        echo "║  or hand-edit the file and add your provider config.         ║"
+        echo "║                                                              ║"
+        echo "║  Docs: https://opencode.ai/docs/providers                   ║"
+        echo "╚══════════════════════════════════════════════════════════════╝"
+        echo ""
+    fi
 }
 
 run_p10k_configure() {
@@ -533,6 +571,8 @@ setup_ohmyzsh
 setup_powerlevel10k
 
 copy_dotfiles
+
+check_opencode_provider
 
 setup_tmux_plugins
 
