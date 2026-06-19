@@ -177,7 +177,7 @@ install_packages() {
             echo "Installing packages with apt..."
             sudo apt update
             
-            sudo apt install -y tmux neovim fzf fd-find sysstat
+            sudo apt install -y tmux neovim fzf fd-find sysstat bc
             
             if ! command -v yazi &> /dev/null; then
                 echo "Installing yazi..."
@@ -247,7 +247,7 @@ install_packages() {
         arch)
             echo "Installing packages with pacman..."
             
-            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat)
+            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc)
             for package in "${packages[@]}"; do
                 if ! pacman -Qi "$package" &> /dev/null; then
                     echo "Installing $package..."

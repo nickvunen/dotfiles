@@ -266,7 +266,7 @@ brew install --cask font-meslo-lg-nerd-font
 ### Ubuntu/Debian (apt)
 ```bash
 # Core packages installed via apt
-sudo apt install tmux neovim fzf fd-find sysstat
+sudo apt install tmux neovim fzf fd-find sysstat bc
 
 # Additional packages installed from official sources or manually:
 # - yazi: via cargo or direct download
@@ -281,7 +281,7 @@ sudo apt install tmux neovim fzf fd-find sysstat
 ### Arch Linux (pacman)
 ```bash
 # All packages available in official repositories
-sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat ttf-meslo-nerd
+sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc ttf-meslo-nerd
 # opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
 
