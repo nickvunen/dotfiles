@@ -19,6 +19,12 @@ yarn/
 .config/opencode/node_modules/
 .config/opencode/bun.lock
 
+# Weave runtime state
+.weave/
+
+# uv cache receipts
+.config/uv/
+
 # Personal configurations
 .config/nvim/lua/user/plugins/dap-config.lua
 .config/gh/
