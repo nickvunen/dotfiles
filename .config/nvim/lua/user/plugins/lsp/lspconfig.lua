@@ -146,5 +146,22 @@ return {
 				},
 			},
 		})
+
+		-- Explicitly enable all configured LSP servers (Nvim 0.11+ API).
+		-- Must match the list in mason.lua's `ensure_installed`.
+		vim.lsp.enable({
+			"ts_ls",
+			"html",
+			"cssls",
+			"tailwindcss",
+			"svelte",
+			"lua_ls",
+			"graphql",
+			"emmet_ls",
+			"prismals",
+			"pyright",
+			"eslint",
+			"rust_analyzer",
+		})
 	end,
 }

@@ -40,6 +40,11 @@ return {
 				"eslint",
 				"rust_analyzer",
 			},
+			-- Disable automatic vim.lsp.enable() — we call it ourselves in
+			-- lspconfig.lua *after* vim.lsp.config() registers settings.
+			-- Without this, Mason enables servers before configs exist, producing
+			-- "config not found" warnings on :checkhealth vim.lsp.
+			automatic_enable = false,
 		})
 
 		mason_tool_installer.setup({
