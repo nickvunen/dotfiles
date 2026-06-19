@@ -49,3 +49,13 @@ opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,te
 -- Python specific settings
 -- vim.g.lazyvim_python_lsp = "pyright"
 -- vim.g.lazyvim_python_ruff = "ruff"
+
+-- providers: disable unused remote-plugin hosts to silence :checkhealth
+-- warnings. None of our plugins use the Perl/Ruby/Node providers
+-- (LSP-based plugins like copilot.vim and opencode.nvim don't need them).
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+
+-- point python3 host explicitly (skips pyenv search, silences "not optimal")
+vim.g.python3_host_prog = vim.fn.expand("~/.pyenv/versions/3.10.13/bin/python3")
