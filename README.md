@@ -285,6 +285,28 @@ sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm syssta
 # opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
 
+#### Omarchy / Hyprland notes
+
+WezTerm installs cleanly via `pacman -S wezterm` on [Omarchy](https://omarchy.org)
+(Omarchy is Arch underneath, default terminal is `foot`, not wezterm). The official
+package is fine — no `wezterm-git` from the AUR needed.
+
+A few Wayland/Hyprland runtime quirks worth knowing:
+
+- **Crash on very long commands** ([wezterm#7725](https://github.com/wezterm/wezterm/issues/7725)).
+  Wayland rejects window titles larger than 4096 bytes, which can happen when
+  pasting huge `curl` lines. Workaround in `.wezterm.lua`:
+  ```lua
+  wezterm.on("format-window-title", function() return "wezterm" end)
+  wezterm.on("format-tab-title",    function() return "tab" end)
+  ```
+- **Prompt scrolls on resize** ([wezterm#7630](https://github.com/wezterm/wezterm/issues/7630)) —
+  no workaround yet, awaiting upstream fix.
+- **Tiny fonts / 1-column strip at startup** — both fixed upstream; if you hit
+  them, update wezterm.
+- **Last-resort fallback to X11**: set `config.enable_wayland = false` in
+  `.wezterm.lua` if Wayland keeps misbehaving.
+
 ## Configuration Files
 
 The repository includes the following configuration files:
