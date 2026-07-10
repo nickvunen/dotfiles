@@ -23,9 +23,10 @@ return {
 
 				-- set keybinds
 				-- Nvim 0.11+ provides builtin `grr` (references), `gra` (code action),
-				-- `grn` (rename), `gri` (implementations). To avoid the 500ms timeoutlen
-				-- pause on `gr`, our Telescope-flavoured references map to `<leader>gr`.
+				-- `grn` (rename), `gri` (implementations). Builtin `grr` uses the
+				-- quickfix list; override it to use Telescope's popup picker instead.
 				opts.desc = "Show LSP references (Telescope)"
+				keymap.set("n", "grr", "<cmd>Telescope lsp_references<CR>", opts)
 				keymap.set("n", "<leader>gr", "<cmd>Telescope lsp_references<CR>", opts)
 
 				opts.desc = "Go to declaration"
