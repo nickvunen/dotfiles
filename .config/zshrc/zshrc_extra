@@ -224,3 +224,14 @@ alias x="exit"
 
 # opencode
 export PATH=$HOME/.opencode/bin:$PATH
+
+# opencode sometimes exits without disabling terminal mouse-tracking mode,
+# which makes every mouse movement afterward get fed to zsh's line editor as
+# garbage escape-code text on the prompt. Force a reset of mouse reporting
+# and cursor visibility after it exits.
+opencode() {
+        command opencode "$@"
+        local ret=$?
+        printf '\e[?1000l\e[?1002l\e[?1003l\e[?1006l\e[?1015l\e[?25h'
+        return $ret
+}
