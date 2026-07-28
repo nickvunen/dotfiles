@@ -2,6 +2,13 @@
 
 set -e
 
+REINSTALL=false
+
+if [[ "$1" == "--reinstall" ]]; then
+    REINSTALL=true
+    echo "Reinstall mode enabled - will reinstall all packages"
+fi
+
 echo "=== Dotfiles Setup Script ==="
 echo ""
 
@@ -19,6 +26,20 @@ detect_os() {
         fi
     else
         echo "unknown"
+    fi
+}
+
+prompt_optional_packages() {
+    echo ""
+    echo "=== Optional Packages ==="
+    echo "Ollama is a large package (1GB+) and requires sufficient CPU/GPU resources."
+    echo ""
+    read -p "Do you want to install Ollama? (y/n) [default: n]: " -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        INSTALL_OLLAMA=true
+    else
+        INSTALL_OLLAMA=false
     fi
 }
 
@@ -78,12 +99,12 @@ install_font() {
     OS=$(detect_os)
     echo ""
     echo "Installing MesloLGS Nerd Font Mono..."
-    
+
     case "$OS" in
         macos)
             echo "Installing font with Homebrew..."
-            
-            if ! brew list --cask font-meslo-lg-nerd-font &> /dev/null; then
+
+            if [ "$REINSTALL" = true ] || ! brew list --cask font-meslo-lg-nerd-font &> /dev/null; then
                 brew install --cask font-meslo-lg-nerd-font
                 echo "MesloLGS Nerd Font installed successfully"
             else
@@ -93,11 +114,11 @@ install_font() {
             
         ubuntu)
             echo "Installing font manually..."
-            
+
             FONT_DIR="$HOME/.local/share/fonts"
             mkdir -p "$FONT_DIR"
-            
-            if ! fc-list | grep -qi "MesloLGS"; then
+
+            if [ "$REINSTALL" = true ] || ! fc-list | grep -qi "MesloLGS"; then
                 echo "Downloading MesloLGS Nerd Font..."
                 FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
                 if curl -fLo /tmp/Meslo.zip "$FONT_URL"; then
@@ -116,8 +137,8 @@ install_font() {
             
         arch)
             echo "Installing font with pacman..."
-            
-            if ! pacman -Qi ttf-meslo-nerd &> /dev/null; then
+
+            if [ "$REINSTALL" = true ] || ! pacman -Qi ttf-meslo-nerd &> /dev/null; then
                 sudo pacman -S --noconfirm ttf-meslo-nerd
                 echo "MesloLGS Nerd Font installed successfully"
             else
@@ -165,19 +186,23 @@ install_packages() {
                 echo "opencode already installed"
             fi
             
-            if ! command -v ollama &> /dev/null; then
-                echo "Installing ollama..."
-                brew install ollama
+            if [ "$INSTALL_OLLAMA" = true ]; then
+                if ! command -v ollama &> /dev/null; then
+                    echo "Installing ollama..."
+                    brew install ollama
+                else
+                    echo "ollama already installed"
+                fi
             else
-                echo "ollama already installed"
+                echo "Skipping ollama installation (optional)"
             fi
             ;;
 
         ubuntu)
             echo "Installing packages with apt..."
             sudo apt update
-            
-            sudo apt install -y tmux neovim fzf fd-find sysstat bc
+
+            sudo apt install -y tmux neovim fzf fd-find sysstat bc zstd
             
             if ! command -v yazi &> /dev/null; then
                 echo "Installing yazi..."
@@ -217,8 +242,11 @@ install_packages() {
             
             if ! command -v thefuck &> /dev/null; then
                 echo "Installing thefuck..."
-                sudo apt install -y python3-pip
-                pip3 install thefuck --user
+                if ! command -v pipx &> /dev/null; then
+                    echo "Installing pipx..."
+                    sudo apt install -y pipx
+                fi
+                pipx install thefuck
             fi
             
             if ! command -v wezterm &> /dev/null; then
@@ -236,11 +264,15 @@ install_packages() {
                 echo "opencode already installed"
             fi
             
-            if ! command -v ollama &> /dev/null; then
-                echo "Installing ollama..."
-                curl -fsSL https://ollama.com/install.sh | sh
+            if [ "$INSTALL_OLLAMA" = true ]; then
+                if ! command -v ollama &> /dev/null; then
+                    echo "Installing ollama..."
+                    curl -fsSL https://ollama.com/install.sh | sh
+                else
+                    echo "ollama already installed"
+                fi
             else
-                echo "ollama already installed"
+                echo "Skipping ollama installation (optional)"
             fi
             ;;
 
@@ -264,11 +296,15 @@ install_packages() {
                 echo "opencode already installed"
             fi
             
-            if ! pacman -Qi ollama &> /dev/null; then
-                echo "Installing ollama..."
-                sudo pacman -S --noconfirm ollama
+            if [ "$INSTALL_OLLAMA" = true ]; then
+                if ! pacman -Qi ollama &> /dev/null; then
+                    echo "Installing ollama..."
+                    sudo pacman -S --noconfirm ollama
+                else
+                    echo "ollama already installed"
+                fi
             else
-                echo "ollama already installed"
+                echo "Skipping ollama installation (optional)"
             fi
             ;;
 
@@ -293,16 +329,16 @@ install_packages() {
 setup_tmux_plugins() {
     echo ""
     echo "Setting up tmux plugins..."
-    
+
     TPM_DIR="$HOME/.tmux/plugins/tpm"
-    
-    if [ ! -d "$TPM_DIR" ]; then
+
+    if [ "$REINSTALL" = true ] || [ ! -d "$TPM_DIR" ]; then
         echo "Cloning TPM (Tmux Plugin Manager)..."
         git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
     else
         echo "TPM already installed"
     fi
-    
+
     if [ -f "$HOME/.tmux.conf" ] && [ -x "$TPM_DIR/bin/install_plugins" ]; then
         echo "Installing tmux plugins via TPM..."
         "$TPM_DIR/bin/install_plugins" || echo "Plugin install hit an issue; run 'prefix + I' inside tmux to retry."
@@ -377,12 +413,12 @@ install_wget_if_needed() {
     OS=$(detect_os)
     echo ""
     echo "Checking wget installation (required for Mason/tooling)..."
-    
+
     if command -v wget &> /dev/null; then
         echo "wget already installed"
         return
     fi
-    
+
     echo "Installing wget..."
     case "$OS" in
         macos)
@@ -400,11 +436,38 @@ install_wget_if_needed() {
     esac
 }
 
+install_unzip_if_needed() {
+    OS=$(detect_os)
+    echo ""
+    echo "Checking unzip installation (required for extracting archives)..."
+
+    if command -v unzip &> /dev/null; then
+        echo "unzip already installed"
+        return
+    fi
+
+    echo "Installing unzip..."
+    case "$OS" in
+        macos)
+            brew install unzip
+            ;;
+        ubuntu)
+            sudo apt install -y unzip
+            ;;
+        arch)
+            sudo pacman -S --noconfirm unzip
+            ;;
+        *)
+            echo "Unknown OS. Please install unzip manually."
+            ;;
+    esac
+}
+
 install_fzf_git() {
     echo ""
     echo "Installing fzf-git.sh..."
-    
-    if [ ! -f ~/.fzf-git.sh ]; then
+
+    if [ "$REINSTALL" = true ] || [ ! -f ~/.fzf-git.sh ]; then
         curl -o ~/.fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh
         echo "fzf-git.sh installed to ~/.fzf-git.sh"
     else
@@ -415,26 +478,26 @@ install_fzf_git() {
 setup_ohmyzsh() {
     echo ""
     echo "Setting up Oh My Zsh..."
-    
-    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+
+    if [ "$REINSTALL" = true ] || [ ! -d "$HOME/.oh-my-zsh" ]; then
         echo "Installing Oh My Zsh..."
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     else
         echo "Oh My Zsh already installed"
     fi
-    
+
     echo "Installing zsh plugins..."
-    
+
     ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-    
-    if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+
+    if [ "$REINSTALL" = true ] || [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
         echo "Installing zsh-autosuggestions..."
         git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
     else
         echo "zsh-autosuggestions already installed"
     fi
-    
-    if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+
+    if [ "$REINSTALL" = true ] || [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
         echo "Installing zsh-syntax-highlighting..."
         git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
     else
@@ -445,10 +508,10 @@ setup_ohmyzsh() {
 setup_powerlevel10k() {
     echo ""
     echo "Setting up Powerlevel10k..."
-    
+
     ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-    
-    if [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]; then
+
+    if [ "$REINSTALL" = true ] || [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]; then
         echo "Installing Powerlevel10k theme..."
         git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
     else
@@ -531,13 +594,30 @@ copy_dotfiles() {
     echo "Copying .wezterm.lua to home directory..."
     copy_unless_symlink .wezterm.lua ~/.wezterm.lua
 
+    echo "Copying .zshenv to home directory..."
+    copy_unless_symlink .zshenv ~/.zshenv
+
     echo "Copying nvim config to ~/.config/nvim/..."
     copy_config_dir .config/nvim
 
     echo "Copying zshrc config to ~/.config/zshrc/..."
     copy_config_dir .config/zshrc
 
-    if [ -f ~/.zshrc ]; then
+    # zshrc_extra already contains a full Oh My Zsh setup (theme, plugins,
+    # instant prompt block, compinit-safe fpath handling). If ~/.zshrc is a
+    # pre-existing file (e.g. from Oh My Zsh's own installer) that still has
+    # its own `source $ZSH/oh-my-zsh.sh` call, appending our source line would
+    # make Oh My Zsh - and compinit - load twice per shell start: once from
+    # the leftover boilerplate, once from zshrc_extra. That's slow and can
+    # double up compinit warnings. Detect that case and collapse ~/.zshrc down
+    # to just the source line, backing up the original first.
+    if [ -f ~/.zshrc ] && grep -q 'source \$ZSH/oh-my-zsh\.sh' ~/.zshrc; then
+        BACKUP=~/.zshrc.pre-dotfiles-backup-$(date +%Y%m%d%H%M%S)
+        echo "Found legacy Oh My Zsh boilerplate in ~/.zshrc (sources oh-my-zsh.sh directly)."
+        echo "Backing up to $BACKUP and replacing with a single source line..."
+        cp ~/.zshrc "$BACKUP"
+        echo "source ~/.config/zshrc/zshrc_extra" > ~/.zshrc
+    elif [ -f ~/.zshrc ]; then
         if ! grep -q "source ~/.config/zshrc/zshrc_extra" ~/.zshrc; then
             echo "Adding source line to ~/.zshrc..."
             echo "" >> ~/.zshrc
@@ -589,12 +669,19 @@ check_opencode_provider() {
 
 run_p10k_configure() {
     echo ""
+
+    if [ "$REINSTALL" = false ] && [ -f "$HOME/.p10k.zsh" ]; then
+        echo "Powerlevel10k is already configured (found ~/.p10k.zsh)"
+        echo "Skipping configuration wizard."
+        return
+    fi
+
     echo "=== Powerlevel10k Configuration ==="
     echo "The configuration wizard will now start."
     echo "This will help you customize your prompt appearance."
     echo ""
     read -p "Press enter to start p10k configuration wizard..."
-    
+
     if command -v zsh &> /dev/null; then
         zsh -i -c "source ~/.zshrc 2>/dev/null; p10k configure"
     else
@@ -603,6 +690,10 @@ run_p10k_configure() {
 }
 
 check_and_switch_to_zsh
+
+prompt_optional_packages
+
+install_unzip_if_needed
 
 install_packages
 
