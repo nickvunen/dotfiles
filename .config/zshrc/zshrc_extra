@@ -77,7 +77,26 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search) 
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search)
+
+# Docker Desktop's WSL integration symlinks its zsh completion into
+# /usr/share/zsh/vendor-completions/_docker, but that symlink only resolves
+# while Docker Desktop is running (target lives under /mnt/wsl/docker-desktop).
+# When it's down, compinit stats the dangling symlink and prints a warning on
+# every shell start, which trips up Powerlevel10k's instant-prompt console-output
+# check. Mirror vendor-completions into a private dir, skipping dead symlinks,
+# and point fpath there instead so compinit never sees the broken entry.
+_ZSH_VENDOR_COMPLETIONS_SRC="/usr/share/zsh/vendor-completions"
+_ZSH_VENDOR_COMPLETIONS_FILTERED="$HOME/.cache/zsh-vendor-completions-filtered"
+if [[ -d $_ZSH_VENDOR_COMPLETIONS_SRC ]]; then
+  mkdir -p "$_ZSH_VENDOR_COMPLETIONS_FILTERED"
+  find "$_ZSH_VENDOR_COMPLETIONS_FILTERED" -type l ! -exec test -e {} \; -delete 2>/dev/null
+  for _f in "$_ZSH_VENDOR_COMPLETIONS_SRC"/*(N); do
+    [[ -e $_f ]] && ln -sf "$_f" "$_ZSH_VENDOR_COMPLETIONS_FILTERED/" 2>/dev/null
+  done
+  fpath=(${fpath:#$_ZSH_VENDOR_COMPLETIONS_SRC} "$_ZSH_VENDOR_COMPLETIONS_FILTERED")
+fi
+unset _ZSH_VENDOR_COMPLETIONS_SRC _ZSH_VENDOR_COMPLETIONS_FILTERED _f
 
 source $ZSH/oh-my-zsh.sh
 
@@ -160,7 +179,16 @@ _load_thefuck() {
 fuck() { _load_thefuck; fuck "$@"; }
 fk() { _load_thefuck; fk "$@"; }
 
-eval "$(fzf --zsh)"
+# Initialize fzf - handle various versions
+if command -v fzf &>/dev/null; then
+  if fzf --zsh &>/dev/null 2>&1; then
+    eval "$(fzf --zsh)"
+  elif fzf --bash &>/dev/null 2>&1; then
+    eval "$(fzf --bash)"
+  else
+    [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+  fi
+fi
 
 # -- Use fd instead of fzf --
 
