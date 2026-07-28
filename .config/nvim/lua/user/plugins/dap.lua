@@ -7,6 +7,20 @@ return {
 			"nvim-neotest/nvim-nio",
 			"mfussenegger/nvim-dap-python",
 		},
+		-- Load only when a debug mapping is first pressed. Loading eagerly cost
+		-- ~475ms of startup, almost all of it the `poetry env info` call below.
+		keys = {
+			{ "<leader>db", desc = "Toggle Breakpoint" },
+			{ "<leader>dc", desc = "Continue/Start Debug" },
+			{ "<leader>di", desc = "Step Into" },
+			{ "<leader>do", desc = "Step Over" },
+			{ "<leader>dO", desc = "Step Out" },
+			{ "<leader>dr", desc = "Toggle REPL" },
+			{ "<leader>dl", desc = "Run Last" },
+			{ "<leader>du", desc = "Toggle Debug UI" },
+			{ "<leader>dt", desc = "Terminate" },
+			{ "<leader>dR", desc = "Open DAP REPL/Console" },
+		},
 		config = function()
 			local dap = require("dap")
 			local dapui = require("dapui")
@@ -53,13 +67,18 @@ return {
 					return venv_path
 				end
 
-				local handle = io.popen("poetry env info -p 2>/dev/null")
-				if handle then
-					local result = handle:read("*a")
-					handle:close()
-					result = result:gsub("%s+", "")
-					if result ~= "" and vim.fn.isdirectory(result) == 1 then
-						return result .. "/bin/python"
+				-- Only shell out to poetry when this actually looks like a poetry
+				-- project. `poetry env info` costs ~450ms through a pyenv shim and
+				-- just errors out when there is no pyproject.toml to find.
+				if #vim.fs.find("pyproject.toml", { upward = true, path = vim.fn.getcwd() }) > 0 then
+					local handle = io.popen("poetry env info -p 2>/dev/null")
+					if handle then
+						local result = handle:read("*a")
+						handle:close()
+						result = result:gsub("%s+", "")
+						if result ~= "" and vim.fn.isdirectory(result) == 1 then
+							return result .. "/bin/python"
+						end
 					end
 				end
 

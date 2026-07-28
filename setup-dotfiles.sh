@@ -473,24 +473,70 @@ copy_if_missing() {
     fi
 }
 
+# Copy a file into place unless the destination is already a symlink. Some
+# machines symlink these back into the repo instead of copying; plain `cp`
+# follows the symlink and resolves to the source itself, failing with
+# "cp: <src> and <dest> are identical (not linked)" and aborting the run.
+copy_unless_symlink() {
+    local src="$1"
+    local dest="$2"
+    if [ -L "$dest" ]; then
+        echo "  [skipped] $dest is a symlink -> $(readlink "$dest")"
+        return 0
+    fi
+    if cp "$src" "$dest"; then
+        echo "  [copied] $dest"
+    else
+        echo "  [ERROR] failed to copy $src -> $dest"
+        return 1
+    fi
+}
+
+# Copy a directory from the repo into ~/.config/.
+#
+# Two traps this avoids:
+#   1. `cp -r src/ dest/` (trailing slash) makes BSD cp copy the *contents* of
+#      src into dest, scattering init.lua/lua/... loose in ~/.config instead of
+#      creating ~/.config/<name>. The trailing slash is deliberately omitted.
+#   2. Some machines symlink ~/.config straight at this repo, so the source and
+#      destination are literally the same directory and copying would duplicate
+#      the tree into itself.
+copy_config_dir() {
+    local src="$1"
+    local name
+    name="$(basename "$src")"
+    local dest="$HOME/.config/$name"
+
+    if [ "$(cd "$src" 2>/dev/null && pwd -P)" = "$(cd "$dest" 2>/dev/null && pwd -P)" ]; then
+        echo "  [skipped] $dest already resolves to $src"
+        return 0
+    fi
+
+    mkdir -p "$HOME/.config"
+    if cp -r "$src" "$HOME/.config/"; then
+        echo "  [copied] $dest"
+    else
+        echo "  [ERROR] failed to copy $src -> $dest"
+        return 1
+    fi
+}
+
 copy_dotfiles() {
     echo ""
     echo "Copying dotfiles..."
-    
+
     echo "Copying .tmux.conf to home directory..."
-    cp .tmux.conf ~/
-    
+    copy_unless_symlink .tmux.conf ~/.tmux.conf
+
     echo "Copying .wezterm.lua to home directory..."
-    cp .wezterm.lua ~/
-    
+    copy_unless_symlink .wezterm.lua ~/.wezterm.lua
+
     echo "Copying nvim config to ~/.config/nvim/..."
-    mkdir -p ~/.config/nvim
-    cp -r .config/nvim/ ~/.config/
-    
+    copy_config_dir .config/nvim
+
     echo "Copying zshrc config to ~/.config/zshrc/..."
-    mkdir -p ~/.config/zshrc
-    cp -r .config/zshrc/ ~/.config/
-    
+    copy_config_dir .config/zshrc
+
     if [ -f ~/.zshrc ]; then
         if ! grep -q "source ~/.config/zshrc/zshrc_extra" ~/.zshrc; then
             echo "Adding source line to ~/.zshrc..."

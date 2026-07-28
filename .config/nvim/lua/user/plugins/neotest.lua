@@ -7,6 +7,15 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		"nvim-neotest/neotest-python", -- Make sure python adapter is included!
 	},
+	-- Deferred until a test mapping is used.
+	keys = {
+		{ "<leader>tt", desc = "Run nearest test" },
+		{ "<leader>tf", desc = "Run file tests" },
+		{ "<leader>ts", desc = "Toggle test summary" },
+		{ "<leader>tc", desc = "Run current test" },
+		{ "<leader>tl", desc = "Run last test" },
+		{ "<leader>td", desc = "Debug nearest test" },
+	},
 	config = function()
 		require("neotest").setup({
 			adapters = {

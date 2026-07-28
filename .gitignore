@@ -35,6 +35,9 @@ yarn/
 *.log
 
 # AI
+# Note: the repo's own AGENTS.md is tracked, so this only ignores stray
+# AGENTS.md/CLAUDE.md files that tooling drops into subdirectories.
 AGENTS.md
 CLAUDE.md
+!/AGENTS.md
 !.config/opencode/AGENTS.md

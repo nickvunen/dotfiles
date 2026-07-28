@@ -12,6 +12,17 @@ return {
 		build = function()
 			require("gitlab.server").build(true)
 		end,
+		-- Deferred until a GitLab mapping is used; loading eagerly also pulled in
+		-- nui, diffview, dressing and web-devicons on every startup.
+		keys = {
+			{ "<leader>gls", desc = "GitLab MR Summary" },
+			{ "<leader>glr", desc = "Start MR Review" },
+			{ "<leader>glc", desc = "Add Comment/Note" },
+			{ "<leader>gla", desc = "Approve MR" },
+			{ "<leader>glA", desc = "Revoke MR Approval" },
+			{ "<leader>glm", desc = "Merge MR" },
+			{ "<leader>gll", desc = "Show Pipeline" },
+		},
 		config = function()
 			require("gitlab").setup()
 			-- Shortcut mappings
