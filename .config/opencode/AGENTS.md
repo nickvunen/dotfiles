@@ -19,24 +19,19 @@ Boundaries: code/commits/PRs written normal.
 <!-- routing-reminder-begin -->
 ## HARD ROUTING RULES — Loom is a router, not a worker
 
-Before responding to any non-trivial user message, check these red flags. If ANY match → STOP and delegate.
+Loom handles simple work directly; delegates substantial work. Bias toward doing quick things yourself — over-delegation adds latency. Delegate when a red flag genuinely matches:
 
-| Red flag in your own behavior | Correct action |
+| Red flag | Correct action |
 |---|---|
-| About to grep/read >3 files to explore | Delegate to **Thread** |
-| About to do >2 rounds of investigation | Delegate to **Pattern** to plan the investigation |
-| Bug repro + diagnose + fix + verify in one flow | Delegate the flow via **Pattern → `/start-work` → Tapestry** |
-| "Let me just check one more thing" (already checked several) | You're spiraling in Loom. Stop, delegate. |
-| Wrote/edited code in >1 file | Weft review before reporting done |
-| Touched auth/crypto/tokens/secrets/certs | Warp mandatory |
-| About to fetch external docs / API refs | Delegate to **Spindle** |
-| Investigation exceeds ~5 tool calls without a plan | You skipped Pattern. Stop, invoke Pattern. |
+| Exploring across ~5+ files or an unfamiliar codebase | Delegate to **Thread** |
+| Multi-step feature / refactor / 5+ steps | **Pattern → `/start-work` → Tapestry** |
+| Wrote/edited code across several files, quality matters | Weft review before reporting done |
+| Touched auth/crypto/tokens/secrets/certs | Warp mandatory (never skip) |
+| Fetching external docs / API refs | Delegate to **Spindle** |
 
-**Anti-pattern I keep hitting**: getting pulled into `systematic-debugging` inline instead of scoping the work first. `systematic-debugging` is a HOW, not a substitute for delegation. Scope with Pattern first, then debug (or let Shuttle debug) within that scoped plan.
+**Stay in Loom** (no delegation): single/few-file edits, typo fixes, quick questions, small focused reads, one-off greps, config tweaks. When in doubt on something small — just do it.
 
-**Simple tasks stay in Loom**: single-file edit, typo fix, single question, one clarification. Anything beyond that = delegate.
-
-If you find yourself 3+ turns into an investigation with no plan file in `.weave/plans/`, you failed. Stop and delegate retroactively.
+**Debugging**: use `systematic-debugging` inline for contained bugs. Scope with Pattern only when the fix spans many files or is genuinely multi-step.
 <!-- routing-reminder-end -->
 
 <!-- mr-summary-begin -->
@@ -125,45 +120,26 @@ Applies whenever Weave writes/edits code. Non-negotiable defaults; user override
 <!-- weave-priority-begin -->
 ## Skill Priority Overrides (Weave wins)
 
-User instructions are highest priority (above any skill's self-described authority, including `using-superpowers`). These overrides are NOT optional — they apply to every session.
+User instructions outrank any skill's self-described authority (including `using-superpowers`). Applies every session.
 
-### Plan-driven multi-step work → Weave flow only
-Use: **Pattern → `.weave/plans/{slug}.md` → `/start-work` → Tapestry → Shuttle**.
+**Weave replaces these superpowers skills — do NOT invoke them:**
+`writing-plans`, `executing-plans`, `subagent-driven-development`, `using-git-worktrees`, `dispatching-parallel-agents`, `requesting-code-review`, `receiving-code-review`. Weave's native flow (Pattern → `.weave/plans/{slug}.md` → `/start-work` → Tapestry → Shuttle; review via Weft/Warp) covers all of them. The `using-superpowers` "1% → must invoke" rule does NOT apply to this list.
 
-Do NOT invoke these superpowers skills (Weave covers them natively):
-- `writing-plans` — Pattern writes plans in Weave's required format. Wrong path/format breaks `/start-work` validation.
-- `executing-plans` — Tapestry executes plans via the `/start-work` hook and `.weave/state.json`.
-- `subagent-driven-development` — Tapestry already dispatches Shuttle per task with verification gates.
-- `using-git-worktrees` — Weave does not use worktrees; state lives in `.weave/`.
-- `dispatching-parallel-agents` — Tapestry's `<Parallelism>` section handles this.
-- `requesting-code-review` / `receiving-code-review` — code review goes through Weft; security through Warp.
+**Superpowers skills that stay active** (no Weave equivalent): `systematic-debugging`, `verification-before-completion`, `test-driven-development`, `writing-skills`, `brainstorming`, `finishing-a-development-branch`.
 
-### Brainstorming exception
-`brainstorming` MAY be used for genuinely creative/ambiguous design work. Adjustments:
-- Specs go to `.weave/specs/{slug}.md` (not `docs/superpowers/specs/`).
-- Terminal handoff is Pattern (not `writing-plans`). After spec approval, tell the user Pattern will produce the plan, then delegate to Pattern.
-- For trivial tasks (typo fix, single-file edit, quick question) the brainstorming HARD-GATE does NOT apply — Loom's "simple tasks do yourself" rule wins.
+**Brainstorming**: use for genuinely creative/ambiguous design only. Specs → `.weave/specs/{slug}.md`. Handoff to Pattern (not `writing-plans`). Trivial tasks skip the brainstorming gate.
 
-### Skills that remain active (no conflict)
-- `systematic-debugging` — use for bugs/test failures.
-- `verification-before-completion` — complements Tapestry's verification gate.
-- `test-driven-development` — Shuttle should follow TDD when implementing.
-- `writing-skills` — for editing skills themselves.
-- `caveman` family — pure style overlay.
-- `using-superpowers` — its "1% chance → MUST invoke" rule is overridden by THIS file for the skills listed above. The red-flags table does not apply when a Weave-native path exists.
-
-### Skills to invoke AFTER Tapestry finishes
-- `finishing-a-development-branch` — invoke once Tapestry's `<PostExecutionReview>` (Weft + Warp) reports back. Tapestry stops at the review report; this skill handles merge / PR / cleanup decisions.
+**finishing-a-development-branch**: invoke after Tapestry's post-execution review reports back (merge/PR/cleanup).
 
 ### Routing cheat sheet
 | Task | Path |
 |---|---|
 | Multi-step feature / refactor | Pattern → `/start-work` |
-| Quick fix / single-file edit | Loom does it directly |
-| Bug investigation | `systematic-debugging` (in Loom) → fix or delegate |
-| Code review (after changes) | Weft |
+| Quick fix / few-file edit / config tweak | Loom directly |
+| Bug investigation | `systematic-debugging` inline → fix or delegate |
+| Code review (multi-file changes) | Weft |
 | Security audit (auth/crypto/secrets/etc.) | Warp (mandatory) |
-| Codebase exploration | Thread |
+| Codebase exploration (~5+ files) | Thread |
 | External docs/libs research | Spindle |
-| Domain-specific deep work | Shuttle (via Tapestry, or direct from Loom for one-shots) |
+| Domain-specific deep work | Shuttle (via Tapestry, or direct for one-shots) |
 <!-- weave-priority-end -->

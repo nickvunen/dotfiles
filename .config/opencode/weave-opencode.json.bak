@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pgermishuys/opencode-weave/main/schema/weave-config.schema.json",
+  "agents": {
+    "loom":     { "model": "amazon-bedrock/eu.anthropic.claude-opus-4-8" },
+    "tapestry": { "model": "amazon-bedrock/eu.anthropic.claude-sonnet-5" },
+    "shuttle":  { "model": "amazon-bedrock/eu.anthropic.claude-sonnet-5" },
+    "pattern":  { "model": "amazon-bedrock/eu.anthropic.claude-opus-4-8" },
+    "thread":   { "model": "amazon-bedrock/eu.anthropic.claude-haiku-4-5-20251001-v1:0" },
+    "spindle":  { "model": "amazon-bedrock/eu.anthropic.claude-haiku-4-5-20251001-v1:0" },
+    "weft":     { "model": "amazon-bedrock/eu.anthropic.claude-sonnet-5" },
+    "warp":     { "model": "amazon-bedrock/eu.anthropic.claude-opus-4-8" }
+  }
+}
