@@ -41,3 +41,10 @@ AGENTS.md
 CLAUDE.md
 !/AGENTS.md
 !.config/opencode/AGENTS.md
+
+# macOS
+.DS_Store
+
+# Editor/tool backups
+*.bak
+*.bak.*
