@@ -169,7 +169,7 @@ install_packages() {
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             fi
             
-            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm)
+            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab)
             for package in "${packages[@]}"; do
                 if ! brew list "$package" &> /dev/null; then
                     echo "Installing $package..."
@@ -257,6 +257,34 @@ install_packages() {
                 sudo apt install -y wezterm
             fi
             
+            if ! command -v gh &> /dev/null; then
+                echo "Installing gh (GitHub CLI)..."
+                sudo mkdir -p -m 755 /etc/apt/keyrings
+                wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+                sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+                echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+                sudo apt update
+                sudo apt install -y gh
+            else
+                echo "gh already installed"
+            fi
+
+            if ! command -v glab &> /dev/null; then
+                echo "Installing glab (GitLab CLI)..."
+                GLAB_ARCH=$(dpkg --print-architecture)
+                GLAB_VERSION=$(curl -s "https://gitlab.com/api/v4/projects/gitlab-org%2Fcli/releases" | grep -o '"tag_name":"v[^"]*"' | head -1 | sed 's/.*"v//;s/"//')
+                if [ -n "$GLAB_VERSION" ]; then
+                    curl -fLo /tmp/glab.deb "https://gitlab.com/gitlab-org/cli/-/releases/v${GLAB_VERSION}/downloads/glab_${GLAB_VERSION}_linux_${GLAB_ARCH}.deb" \
+                        && sudo dpkg -i /tmp/glab.deb \
+                        && rm -f /tmp/glab.deb \
+                        || echo "glab install failed. Download manually: https://gitlab.com/gitlab-org/cli/-/releases"
+                else
+                    echo "Could not resolve latest glab version. Install manually: https://gitlab.com/gitlab-org/cli/-/releases"
+                fi
+            else
+                echo "glab already installed"
+            fi
+
             if ! command -v opencode &> /dev/null; then
                 echo "Installing opencode..."
                 curl -fsSL https://opencode.ai/install | bash
@@ -279,7 +307,7 @@ install_packages() {
         arch)
             echo "Installing packages with pacman..."
             
-            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc)
+            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc github-cli glab)
             for package in "${packages[@]}"; do
                 if ! pacman -Qi "$package" &> /dev/null; then
                     echo "Installing $package..."
@@ -321,6 +349,8 @@ install_packages() {
             echo "  - thefuck"
             echo "  - wezterm"
             echo "  - opencode"
+            echo "  - gh (GitHub CLI)"
+            echo "  - glab (GitLab CLI)"
             read -p "Press enter to continue with dotfiles setup..."
             ;;
     esac

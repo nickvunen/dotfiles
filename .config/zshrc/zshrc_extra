@@ -222,6 +222,17 @@ alias lg="lazygit"
 alias c="clear"
 alias x="exit"
 
+# Merge/pull request review helpers (gh = GitHub, glab = GitLab)
+alias mrs="glab mr list"
+alias mrv="glab mr view"          # mrv <id>       — description + discussion
+alias mrd="glab mr diff"          # mrd <id>       — full diff
+alias mrco="glab mr checkout"     # mrco <id>      — check out the MR branch
+alias mra="glab mr approve"
+alias prs="gh pr list"
+alias prv="gh pr view"            # prv <number>
+alias prd="gh pr diff"            # prd <number>
+alias prco="gh pr checkout"       # prco <number>
+
 # opencode
 export PATH=$HOME/.opencode/bin:$PATH
 

@@ -34,7 +34,7 @@ The `setup-dotfiles.sh` script performs the following actions:
 
 1. **Detects your OS** and installs packages using the appropriate package manager
 2. **Switches your shell to zsh** if you're currently using bash or another shell
-3. **Installs all required packages** (tmux, neovim, yazi, lazygit, fzf, zoxide, eza, fd, thefuck, wezterm, opencode)
+3. **Installs all required packages** (tmux, neovim, yazi, lazygit, fzf, zoxide, eza, fd, thefuck, wezterm, opencode, gh, glab)
 4. **Installs MesloLGS Nerd Font** for proper icon rendering
 5. **Installs fzf-git.sh** for enhanced git integration with fzf
 6. **Sets up Oh My Zsh** with plugins (zsh-autosuggestions, zsh-syntax-highlighting)
@@ -103,7 +103,7 @@ After running the setup script successfully, you should see:
 1. **Shell changed to zsh** - Your default shell will be zsh
 2. **Oh My Zsh installed** - Located at `~/.oh-my-zsh/`
 3. **Powerlevel10k theme active** - Beautiful prompt with git status, etc.
-4. **All CLI tools available** - Run `which tmux nvim yazi lazygit fzf zoxide eza fd thefuck wezterm opencode` to verify
+4. **All CLI tools available** - Run `which tmux nvim yazi lazygit fzf zoxide eza fd thefuck wezterm opencode gh glab` to verify
 5. **Configuration files in place**:
    - `~/.tmux.conf`
    - `~/.wezterm.lua`
@@ -135,6 +135,8 @@ fd --version
 thefuck --version
 wezterm --version
 opencode --version
+gh --version
+glab --version
 
 # Check Oh My Zsh plugins
 ls ~/.oh-my-zsh/custom/plugins/
@@ -190,6 +192,8 @@ The setup script installs and configures the following tools, organized by categ
 |------|-------------|
 | [lazygit](https://github.com/jesseduffield/lazygit) | Simple terminal UI for git commands |
 | [fzf-git.sh](https://github.com/junegunn/fzf-git.sh) | Key bindings for Git objects powered by fzf |
+| [gh](https://cli.github.com/) | GitHub CLI — PRs, issues, reviews, CI runs from the terminal |
+| [glab](https://gitlab.com/gitlab-org/cli) | GitLab CLI — MRs, issues, reviews, pipelines from the terminal |
 
 ### CLI Utilities
 | Tool | Description |
@@ -221,7 +225,7 @@ The setup script installs and configures the following tools, organized by categ
 
 ## Post-Installation Authentication
 
-After running the setup script, two tools require a one-time login.
+After running the setup script, a few tools require a one-time login.
 
 ### GitHub Copilot (Neovim)
 
@@ -277,6 +281,140 @@ ollama run llama3.2
 
 Then select an Ollama model when running `opencode`. The `ollama serve` daemon must be running (it starts automatically on macOS after install).
 
+### GitHub CLI (`gh`)
+
+```bash
+gh auth login
+```
+Pick **GitHub.com** (or **GitHub Enterprise Server** and enter your host), choose HTTPS, and
+authenticate via browser or a personal access token. Verify with `gh auth status`.
+
+To let `gh` handle git credentials too:
+```bash
+gh auth setup-git
+```
+
+### GitLab CLI (`glab`)
+
+```bash
+glab auth login
+```
+Pick **gitlab.com** or **self-managed** (then enter your instance hostname, e.g. `gitlab.company.com`).
+It asks for a personal access token — create one at `https://<your-gitlab-host>/-/user_settings/personal_access_tokens`
+with the `api` and `write_repository` scopes. Verify with `glab auth status`.
+
+For a self-managed instance you can also pin the host per repo so you don't have to pass `--repo` every time:
+```bash
+glab config set -g host gitlab.company.com
+```
+
+## Handling a Merge Request / Pull Request
+
+The dotfiles ship [`glab`](https://gitlab.com/gitlab-org/cli) (GitLab) and [`gh`](https://cli.github.com/) (GitHub)
+so the whole review loop stays in the terminal. Both CLIs infer the project from the git remote of your current
+directory — `cd` into the repo first, then run the commands below.
+
+### Reviewing someone else's MR (GitLab)
+
+```bash
+# 1. See what's waiting on you
+glab mr list --reviewer=@me      # or: glab mr list --assignee=@me
+
+# 2. Read the description + existing discussion
+glab mr view 42                  # add --web to open it in the browser
+
+# 3. Read the diff
+glab mr diff 42
+
+# 4. Optional: check it out locally to run tests / poke at it in nvim
+glab mr checkout 42
+nvim .                           # <leader>hd for gitsigns diff, <leader>lg for lazygit
+
+# 5. Comment and decide
+glab mr note 42 -m "Nit: this loop can use the existing helper in utils.go"
+glab mr approve 42
+glab mr merge 42                 # --squash --remove-source-branch as needed
+
+# 6. Back to your own work
+git checkout -
+```
+
+Useful extras:
+```bash
+glab mr todo 42                  # add it to your GitLab to-do list
+glab ci status                   # pipeline status for the current branch
+glab ci view                     # interactive pipeline/job browser
+glab mr update 42 --ready        # flip a draft MR to ready
+```
+
+### Reviewing someone else's PR (GitHub)
+
+```bash
+gh pr list --search "review-requested:@me"
+gh pr view 42
+gh pr diff 42
+gh pr checkout 42
+gh pr review 42 --comment -b "Looks good, one question inline"
+gh pr review 42 --approve
+gh pr merge 42 --squash --delete-branch
+gh pr checks 42                  # CI status
+```
+
+### Opening your own MR/PR
+
+```bash
+git checkout -b feat/thing
+# ... work, commit ...
+git push -u origin HEAD
+
+# GitLab
+glab mr create --fill --draft            # --fill reuses commit messages as title/description
+glab mr create --fill --reviewer alice,bob
+
+# GitHub
+gh pr create --fill --draft
+gh pr create --fill --reviewer alice,bob
+```
+
+To write the description with AI instead of `--fill`, use the bundled opencode command
+(`.config/opencode/commands/summarize-mr.md`) from inside the repo:
+
+```bash
+opencode
+# then, in the TUI:
+/summarize-mr
+```
+It inspects `git status`/`git diff` against the base branch and emits a raw markdown block with
+**Summary of changes** and **Test instructions** — paste it straight into the MR body, or:
+
+```bash
+glab mr create --title "feat: thing" --description "$(cat description.md)"
+```
+
+### AI-assisted review
+
+With the opencode config in these dotfiles you can also review a checked-out MR from the editor:
+
+- `<leader>ar` in Neovim — review the current buffer/selection for correctness and readability
+- `/caveman-review` in the opencode TUI — terse one-line-per-finding review
+- Pipe a diff in directly: `glab mr diff 42 | opencode run "Review this diff. One line per finding, severity first."`
+
+### Shell aliases
+
+The zsh config defines short aliases for the commands above:
+
+| Alias | Expands to |
+|-------|------------|
+| `mrs` | `glab mr list` |
+| `mrv <id>` | `glab mr view` |
+| `mrd <id>` | `glab mr diff` |
+| `mrco <id>` | `glab mr checkout` |
+| `mra <id>` | `glab mr approve` |
+| `prs` | `gh pr list` |
+| `prv <n>` | `gh pr view` |
+| `prd <n>` | `gh pr diff` |
+| `prco <n>` | `gh pr checkout` |
+
 ## OS-Specific Installation Notes
 
 The setup script automatically detects your operating system and installs packages using the appropriate package manager:
@@ -285,7 +423,7 @@ The setup script automatically detects your operating system and installs packag
 ```bash
 # Homebrew is installed automatically if not present
 # Packages installed via: brew install <package>
-brew install tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm
+brew install tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab
 brew install --cask font-meslo-lg-nerd-font
 # opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
@@ -303,12 +441,14 @@ sudo apt install tmux neovim fzf fd-find sysstat bc
 # - thefuck: via pip
 # - wezterm: from wez repository
 # - opencode: via install script (curl -fsSL https://opencode.ai/install | bash)
+# - gh: from the official cli.github.com apt repo
+# - glab: .deb from the latest GitLab CLI release
 ```
 
 ### Arch Linux (pacman)
 ```bash
 # All packages available in official repositories
-sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc ttf-meslo-nerd
+sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc ttf-meslo-nerd github-cli glab
 # opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
 
@@ -846,6 +986,15 @@ Requires `opencode` CLI on `$PATH`. `<leader>ac` opens the TUI as a right split 
 | `x` | Exit terminal |
 | `y` | Open Yazi file manager |
 | `fuck` / `fk` | Correct previous command (thefuck) |
+| `mrs` | List GitLab merge requests (`glab mr list`) |
+| `mrv <id>` | View a merge request (`glab mr view`) |
+| `mrd <id>` | Diff a merge request (`glab mr diff`) |
+| `mrco <id>` | Check out a merge request branch (`glab mr checkout`) |
+| `mra <id>` | Approve a merge request (`glab mr approve`) |
+| `prs` | List GitHub pull requests (`gh pr list`) |
+| `prv <n>` | View a pull request (`gh pr view`) |
+| `prd <n>` | Diff a pull request (`gh pr diff`) |
+| `prco <n>` | Check out a pull request branch (`gh pr checkout`) |
 
 #### FZF Integration
 | Shortcut | Description |
