@@ -169,7 +169,7 @@ install_packages() {
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             fi
             
-            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab)
+            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab git-delta)
             for package in "${packages[@]}"; do
                 if ! brew list "$package" &> /dev/null; then
                     echo "Installing $package..."
@@ -285,6 +285,25 @@ install_packages() {
                 echo "glab already installed"
             fi
 
+            if ! command -v delta &> /dev/null; then
+                echo "Installing git-delta..."
+                DELTA_ARCH=$(dpkg --print-architecture)
+                DELTA_VERSION=""
+                if DELTA_RELEASE_URL=$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/dandavison/delta/releases/latest"); then
+                    DELTA_VERSION=${DELTA_RELEASE_URL##*/}
+                fi
+                DELTA_DEB="/tmp/git-delta_${DELTA_VERSION}_${DELTA_ARCH}.deb"
+                if [ -n "$DELTA_VERSION" ] && curl -fLo "$DELTA_DEB" "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/git-delta_${DELTA_VERSION}_${DELTA_ARCH}.deb"; then
+                    sudo dpkg -i "$DELTA_DEB"
+                    rm -f "$DELTA_DEB"
+                else
+                    rm -f "$DELTA_DEB"
+                    echo "git-delta install failed. Download manually: https://github.com/dandavison/delta/releases"
+                fi
+            else
+                echo "git-delta already installed"
+            fi
+
             if ! command -v opencode &> /dev/null; then
                 echo "Installing opencode..."
                 curl -fsSL https://opencode.ai/install | bash
@@ -307,7 +326,7 @@ install_packages() {
         arch)
             echo "Installing packages with pacman..."
             
-            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc github-cli glab)
+            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc github-cli glab git-delta)
             for package in "${packages[@]}"; do
                 if ! pacman -Qi "$package" &> /dev/null; then
                     echo "Installing $package..."
@@ -351,6 +370,7 @@ install_packages() {
             echo "  - opencode"
             echo "  - gh (GitHub CLI)"
             echo "  - glab (GitLab CLI)"
+            echo "  - git-delta (side-by-side diff viewer)"
             read -p "Press enter to continue with dotfiles setup..."
             ;;
     esac

@@ -34,7 +34,7 @@ The `setup-dotfiles.sh` script performs the following actions:
 
 1. **Detects your OS** and installs packages using the appropriate package manager
 2. **Switches your shell to zsh** if you're currently using bash or another shell
-3. **Installs all required packages** (tmux, neovim, yazi, lazygit, fzf, zoxide, eza, fd, thefuck, wezterm, opencode, gh, glab)
+3. **Installs all required packages** (tmux, neovim, yazi, lazygit, fzf, zoxide, eza, fd, thefuck, wezterm, opencode, gh, glab, git-delta)
 4. **Installs MesloLGS Nerd Font** for proper icon rendering
 5. **Installs fzf-git.sh** for enhanced git integration with fzf
 6. **Sets up Oh My Zsh** with plugins (zsh-autosuggestions, zsh-syntax-highlighting)
@@ -103,7 +103,7 @@ After running the setup script successfully, you should see:
 1. **Shell changed to zsh** - Your default shell will be zsh
 2. **Oh My Zsh installed** - Located at `~/.oh-my-zsh/`
 3. **Powerlevel10k theme active** - Beautiful prompt with git status, etc.
-4. **All CLI tools available** - Run `which tmux nvim yazi lazygit fzf zoxide eza fd thefuck wezterm opencode gh glab` to verify
+4. **All CLI tools available** - Run `which tmux nvim yazi lazygit fzf zoxide eza fd thefuck wezterm opencode gh glab delta` to verify
 5. **Configuration files in place**:
    - `~/.tmux.conf`
    - `~/.wezterm.lua`
@@ -137,6 +137,7 @@ wezterm --version
 opencode --version
 gh --version
 glab --version
+delta --version
 
 # Check Oh My Zsh plugins
 ls ~/.oh-my-zsh/custom/plugins/
@@ -194,6 +195,7 @@ The setup script installs and configures the following tools, organized by categ
 | [fzf-git.sh](https://github.com/junegunn/fzf-git.sh) | Key bindings for Git objects powered by fzf |
 | [gh](https://cli.github.com/) | GitHub CLI — PRs, issues, reviews, CI runs from the terminal |
 | [glab](https://gitlab.com/gitlab-org/cli) | GitLab CLI — MRs, issues, reviews, pipelines from the terminal |
+| [git-delta](https://dandavison.github.io/delta/) | Syntax-highlighted side-by-side diff viewer |
 
 ### CLI Utilities
 | Tool | Description |
@@ -323,8 +325,9 @@ glab mr list --reviewer=@me      # or: glab mr list --assignee=@me
 # 2. Read the description + existing discussion
 glab mr view 42                  # add --web to open it in the browser
 
-# 3. Read the diff
+# 3. Read the diff (regular or side-by-side)
 glab mr diff 42
+glab mr diff 42 --raw | delta --side-by-side
 
 # 4. Optional: check it out locally to run tests / poke at it in nvim
 glab mr checkout 42
@@ -423,7 +426,7 @@ The setup script automatically detects your operating system and installs packag
 ```bash
 # Homebrew is installed automatically if not present
 # Packages installed via: brew install <package>
-brew install tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab
+brew install tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab git-delta
 brew install --cask font-meslo-lg-nerd-font
 # opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
@@ -443,12 +446,13 @@ sudo apt install tmux neovim fzf fd-find sysstat bc
 # - opencode: via install script (curl -fsSL https://opencode.ai/install | bash)
 # - gh: from the official cli.github.com apt repo
 # - glab: .deb from the latest GitLab CLI release
+# - git-delta: .deb from the latest GitHub release
 ```
 
 ### Arch Linux (pacman)
 ```bash
 # All packages available in official repositories
-sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc ttf-meslo-nerd github-cli glab
+sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc ttf-meslo-nerd github-cli glab git-delta
 # opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
 
