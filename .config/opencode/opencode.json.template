@@ -19,8 +19,7 @@
   "plugin": [
     "opencode-wakelock",
     "@ramtinj95/opencode-tokenscope",
-    "./plugins/caveman/plugin.js",
-    "superpowers@git+https://github.com/obra/superpowers.git",
-    "@opencode_weave/weave"
+    "./plugins/caveman",
+    "superpowers@git+https://github.com/obra/superpowers.git"
   ]
 }
