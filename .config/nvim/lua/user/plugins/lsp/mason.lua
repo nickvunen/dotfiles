@@ -54,9 +54,10 @@ return {
 				"isort", -- python formatter
 				"black", -- python formatter
 				"pylint",
-				"eslint_d",
-				"rustfmt",
-			},
+					"eslint_d",
+					"rustfmt",
+					"codelldb",
+				},
 		})
 	end,
 }

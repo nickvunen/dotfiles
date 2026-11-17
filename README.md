@@ -47,6 +47,8 @@ The `setup-dotfiles.sh` script performs the following actions:
    - `.config/yazi/` → `~/.config/yazi/`
    - `.config/thefuck/` → `~/.config/thefuck/`
    - `.config/opencode/` → `~/.config/opencode/` (no-clobber — preserves your local `opencode.json`)
+   - Claude Code / Codex: `CLAUDE.md`, `AGENTS.md`, keybindings and skills are **symlinked** into `~/.claude`, `~/.codex` and `~/.agents`; `settings.json` / `config.toml` are seeded once from templates
+   - `mcp/caveman/` is built and registered as a Claude Code MCP server
 9. **Adds source lines** to `~/.zshrc` for extra configurations
 10. **Launches the Powerlevel10k configuration wizard** for prompt customization
 
@@ -111,7 +113,8 @@ After running the setup script successfully, you should see:
    - `~/.config/zshrc/`
    - `~/.config/yazi/`
    - `~/.config/thefuck/`
-   - `~/.config/opencode/` (caveman skills + plugin + agents; your own `opencode.json` is not overwritten)
+   - `~/.config/opencode/` (your own `opencode.json` is not overwritten)
+   - `~/.claude/`, `~/.codex/`, `~/.agents/skills/` (symlinks back into this repo)
 6. **MesloLGS Nerd Font installed** - Icons should render correctly in the terminal
 7. **fzf-git.sh available** - Located at `~/.fzf-git.sh`
 
@@ -182,6 +185,7 @@ The setup script installs and configures the following tools, organized by categ
 | Tool | Description |
 |------|-------------|
 | [Neovim](https://neovim.io/) | Hyperextensible Vim-based text editor |
+| [tree-sitter CLI](https://tree-sitter.github.io/tree-sitter/) | Builds syntax parsers used by Neovim |
 
 ### File Manager
 | Tool | Description |
@@ -212,13 +216,9 @@ The setup script installs and configures the following tools, organized by categ
 | Tool | Description |
 |------|-------------|
 | [opencode](https://opencode.ai/) | AI coding agent for the terminal (also listed above) |
-| AGENTS.md overlay | Caveman compression + C-3PO persona + Weave routing rules for opencode |
-| caveman plugin | opencode plugin for caveman mode tracking |
-| caveman skills (6) | Slash-command skill family: `caveman`, `caveman-commit`, `caveman-compress`, `caveman-help`, `caveman-review`, `caveman-stats` |
-| [Weave](https://github.com/pgermishuys/opencode-weave) (`@opencode_weave/weave`) | Multi-agent orchestration framework for opencode |
-| [Superpowers](https://github.com/obra/superpowers) (`superpowers@git+https://github.com/obra/superpowers.git`) | Skill library for structured AI workflows |
-| tokenscope plugin (`@ramtinj95/opencode-tokenscope`) | Token usage analytics for opencode sessions |
-| wakelock plugin (`opencode-wakelock`) | Prevents system sleep during long opencode sessions |
+| AGENTS.md overlay | C-3PO persona + memory, MR, ticket, coding-style and review rules for opencode |
+| oh-my-opencode-slim plugin | Orchestrator + specialist subagents for opencode |
+| caveman MCP (`mcp/caveman/`) | Short, plain answers (TLDR/KISS) for every agent; `caveman_off` / `caveman_on` tools |
 
 ### Fonts
 | Font | Description |
@@ -239,7 +239,12 @@ This opens a GitHub authentication flow in your browser. Follow the prompt to au
 
 ### opencode
 
-After install, `~/.config/opencode/opencode.json` is a copy of the shipped template with a placeholder `"provider"` block. Two ways to configure:
+After install, `~/.config/opencode/opencode.json` is a copy of the tracked config (Amazon Bedrock, with the caveman, basic-memory and ecmwf MCP servers). To use another provider:
+
+The Bedrock profile name is read from `~/.config/opencode/.bedrock-profile` (gitignored). Create it once:
+```bash
+printf '<your-aws-profile>' > ~/.config/opencode/.bedrock-profile
+```
 
 **Option A — interactive login** (opencode writes the file for you):
 ```bash
@@ -248,11 +253,7 @@ opencode auth login
 Pick a provider (Anthropic, OpenAI, Amazon Bedrock, etc.) and follow the prompts.
 
 **Option B — hand-edit** `~/.config/opencode/opencode.json`:
-Replace the placeholder `provider` block with your chosen provider config (Bedrock, Anthropic, OpenAI, Ollama, etc.). The `_comment_*` keys in the template explain each option inline.
-
-A second file, `~/.config/opencode/weave-opencode.json`, exists separately and configures per-agent model overrides for the [Weave](https://github.com/pgermishuys/opencode-weave) multi-agent framework. Edit it to assign different models to different agents.
-
-The Weave and Superpowers plugins load automatically on first `opencode` launch — fetched via opencode's package system, no manual install needed.
+Replace the `provider` block with your chosen provider config (Bedrock, Anthropic, OpenAI, Ollama, etc.).
 
 The `opencode.nvim` plugin integrates with Neovim — see `.config/nvim/lua/user/plugins/opencode.lua`. Keybindings use the `<leader>a` prefix.
 
@@ -426,7 +427,7 @@ The setup script automatically detects your operating system and installs packag
 ```bash
 # Homebrew is installed automatically if not present
 # Packages installed via: brew install <package>
-brew install tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab git-delta
+brew install tmux neovim tree-sitter-cli yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab git-delta
 brew install --cask font-meslo-lg-nerd-font
 # opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
@@ -447,12 +448,13 @@ sudo apt install tmux neovim fzf fd-find sysstat bc
 # - gh: from the official cli.github.com apt repo
 # - glab: .deb from the latest GitLab CLI release
 # - git-delta: .deb from the latest GitHub release
+# - tree-sitter CLI: binary from the latest GitHub release
 ```
 
 ### Arch Linux (pacman)
 ```bash
 # All packages available in official repositories
-sudo pacman -S tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc ttf-meslo-nerd github-cli glab git-delta
+sudo pacman -S tmux neovim tree-sitter-cli yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc ttf-meslo-nerd github-cli glab git-delta
 # opencode installed via: curl -fsSL https://opencode.ai/install | bash
 ```
 
@@ -490,7 +492,11 @@ The repository includes the following configuration files:
 | `.config/zshrc/` | Additional zsh configuration |
 | `.config/yazi/` | Yazi file manager configuration |
 | `.config/thefuck/` | thefuck configuration |
-| `.config/opencode/` | opencode AI agent config — caveman skills, plugin, agent specs. `opencode.json` and `weave-opencode.json` are gitignored (personal model/provider settings). |
+| `.config/opencode/` | opencode AI agent config — `opencode.json`, global `AGENTS.md`, commands, oh-my-opencode-slim presets |
+| `.config/claude/` | Claude Code — global `CLAUDE.md` (symlinked) and `settings.json.template` |
+| `.config/codex/` | Codex — global `AGENTS.md`, keybindings, skills (symlinked) and `config.toml.template` |
+| `.agents/skills/` | Skills shared by Claude Code and Codex (symlinked into `~/.agents/skills/`) |
+| `mcp/caveman/` | MCP server that makes agents answer short and plain (caveman style) |
 
 ## Optional: Debug Adapter Protocol (DAP) Configuration
 
@@ -784,6 +790,24 @@ Leader key: `Space`
 | `S` | Normal/Visual/Operator | Flash treesitter |
 | `r` | Operator | Remote flash |
 | `R` | Operator/Visual | Treesitter search |
+
+#### Tree-sitter Text Objects
+| Shortcut | Mode | Description |
+|----------|------|-------------|
+| `a=` / `i=` / `l=` / `r=` | Operator/Visual | Select assignment: outer / inner / left / right |
+| `a:` / `i:` / `l:` / `r:` | Operator/Visual | Select property: outer / inner / left / right |
+| `aa` / `ia` | Operator/Visual | Select parameter: outer / inner |
+| `ai` / `ii` | Operator/Visual | Select conditional: outer / inner |
+| `al` / `il` | Operator/Visual | Select loop: outer / inner |
+| `af` / `if` | Operator/Visual | Select function call: outer / inner |
+| `am` / `im` | Operator/Visual | Select function: outer / inner |
+| `ac` / `ic` | Operator/Visual | Select class: outer / inner |
+| `Space+n{a,:,m}` / `Space+p{a,:,m}` | Normal | Swap parameter, property, or function next / previous |
+| `]{f,m,c,i,l}` / `[{f,m,c,i,l}` | Normal/Visual/Operator | Move to next / previous object start |
+| `]{F,M,C,I,L}` / `[{F,M,C,I,L}` | Normal/Visual/Operator | Move to next / previous object end |
+| `]s` / `]z` | Normal/Visual/Operator | Move to next scope / fold |
+| `;` / `,` | Normal/Visual/Operator | Repeat / reverse last text-object movement |
+| `f` / `F` / `t` / `T` | Normal/Visual/Operator | Built-in character movement with repeat support |
 
 #### Formatting
 | Shortcut | Mode | Description |

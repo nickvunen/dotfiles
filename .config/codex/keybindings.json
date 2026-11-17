@@ -1,0 +1,10 @@
+[
+  {
+    "command": "openAvatarOverlay",
+    "key": "Ctrl+Space"
+  },
+  {
+    "command": "quickChat",
+    "key": "Alt+G"
+  }
+]

@@ -1,0 +1,70 @@
+model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
+service_tier = "default"
+approval_policy = "on-request"
+approvals_reviewer = "guardian_subagent"
+sandbox_mode = "workspace-write"
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+
+[plugins."chrome@openai-bundled"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."expo@openai-curated"]
+enabled = true
+
+[features]
+js_repl = false
+memories = true
+
+[mcp_servers.blender]
+command = "__HOME__/.local/bin/mcp-for-blender"
+args = ["--host", "127.0.0.1"]
+
+[mcp_servers.blender.env]
+BLENDER_MCP_DISABLE_TELEMETRY = "1"
+BLENDER_MCP_SAFE_MODE = "1"
+
+[desktop.open-in-target-preferences]
+global = "terminal"
+
+[tui]
+screen_reader_detection_done = true
+
+[memories]
+generate_memories = true
+use_memories = true
+
+[notice]
+hide_rate_limit_model_nudge = true
+
+[browser_use.origins."https://www.meshy.ai"]
+access = "allow"

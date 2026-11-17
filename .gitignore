@@ -12,18 +12,24 @@ iterm2/
 yarn/
 
 # opencode: track config, exclude secrets / state / generated
-.config/opencode/opencode.json
 .config/opencode/opencode.json.bak
 .config/opencode/weave-opencode.json
-.config/opencode/.caveman-active
 .config/opencode/node_modules/
 .config/opencode/bun.lock
+.config/opencode/.bedrock-profile
 
 # Weave runtime state
 .weave/
 
 # uv cache receipts
 .config/uv/
+
+# App state / credentials written into .config
+.config/acli/
+.config/blender-mcp/
+.config/configstore/
+.config/lekker-ademen/
+.config/opencode-mobile/
 
 # Personal configurations
 .config/nvim/lua/user/plugins/dap-config.lua
@@ -41,6 +47,8 @@ AGENTS.md
 CLAUDE.md
 !/AGENTS.md
 !.config/opencode/AGENTS.md
+!.config/claude/CLAUDE.md
+!.config/codex/AGENTS.md
 
 # macOS
 .DS_Store

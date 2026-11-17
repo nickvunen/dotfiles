@@ -1,0 +1,38 @@
+{
+  "$schema": "https://unpkg.com/oh-my-opencode-slim@latest/oh-my-opencode-slim.schema.json",
+  "preset": "bedrock",
+  "presets": {
+    "bedrock": {
+      "orchestrator": {
+        "model": "amazon-bedrock/eu.anthropic.claude-opus-5-5",
+        "skills": ["*"],
+        "mcps": ["*", "!context7"]
+      },
+      "oracle": {
+        "model": "amazon-bedrock/eu.anthropic.claude-opus-5-5",
+        "skills": ["simplify"],
+        "mcps": []
+      },
+      "librarian": {
+        "model": "amazon-bedrock/eu.anthropic.claude-haiku-5-5",
+        "skills": [],
+        "mcps": ["context7", "gh_grep"]
+      },
+      "explorer": {
+        "model": "amazon-bedrock/eu.anthropic.claude-haiku-5-5",
+        "skills": [],
+        "mcps": []
+      },
+      "designer": {
+        "model": "amazon-bedrock/eu.anthropic.claude-sonnet-5-5",
+        "skills": [],
+        "mcps": []
+      },
+      "fixer": {
+        "model": "amazon-bedrock/eu.anthropic.claude-sonnet-5-5",
+        "skills": [],
+        "mcps": []
+      }
+    }
+  }
+}

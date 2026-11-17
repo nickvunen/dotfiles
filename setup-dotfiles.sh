@@ -169,7 +169,7 @@ install_packages() {
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             fi
             
-            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab git-delta)
+            packages=(tmux neovim tree-sitter-cli yazi lazygit fzf zoxide eza fd thefuck wezterm gh glab git-delta)
             for package in "${packages[@]}"; do
                 if ! brew list "$package" &> /dev/null; then
                     echo "Installing $package..."
@@ -203,6 +203,27 @@ install_packages() {
             sudo apt update
 
             sudo apt install -y tmux neovim fzf fd-find sysstat bc zstd
+
+            if ! command -v tree-sitter &> /dev/null; then
+                echo "Installing tree-sitter CLI..."
+                case "$(dpkg --print-architecture)" in
+                    amd64) TREE_SITTER_ARCH="x64" ;;
+                    arm64) TREE_SITTER_ARCH="arm64" ;;
+                    armhf) TREE_SITTER_ARCH="arm" ;;
+                    *) TREE_SITTER_ARCH="" ;;
+                esac
+
+                if [ -n "$TREE_SITTER_ARCH" ] && curl -fLo /tmp/tree-sitter.gz "https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-${TREE_SITTER_ARCH}.gz"; then
+                    gzip -dc /tmp/tree-sitter.gz > /tmp/tree-sitter
+                    sudo install -m 0755 /tmp/tree-sitter /usr/local/bin/tree-sitter
+                    rm -f /tmp/tree-sitter.gz /tmp/tree-sitter
+                else
+                    rm -f /tmp/tree-sitter.gz
+                    echo "tree-sitter CLI install failed. Download manually: https://github.com/tree-sitter/tree-sitter/releases"
+                fi
+            else
+                echo "tree-sitter CLI already installed"
+            fi
             
             if ! command -v yazi &> /dev/null; then
                 echo "Installing yazi..."
@@ -326,7 +347,7 @@ install_packages() {
         arch)
             echo "Installing packages with pacman..."
             
-            packages=(tmux neovim yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc github-cli glab git-delta)
+            packages=(tmux neovim tree-sitter-cli yazi lazygit fzf zoxide eza fd thefuck wezterm sysstat bc github-cli glab git-delta)
             for package in "${packages[@]}"; do
                 if ! pacman -Qi "$package" &> /dev/null; then
                     echo "Installing $package..."
@@ -359,6 +380,7 @@ install_packages() {
             echo "Unknown OS. Please install packages manually:"
             echo "  - tmux"
             echo "  - neovim (nvim)"
+            echo "  - tree-sitter CLI"
             echo "  - yazi"
             echo "  - lazygit"
             echo "  - fzf"
@@ -578,7 +600,7 @@ copy_if_missing() {
     fi
     if [ -e "$dest" ]; then
         echo "  [skipped] $dest (already exists)"
-    elif cp "$src" "$dest"; then
+    elif sed "s|__HOME__|$HOME|g" "$src" > "$dest"; then
         echo "  [created] $dest"
     else
         echo "  [ERROR] failed to copy $src -> $dest"
@@ -690,12 +712,8 @@ copy_dotfiles() {
 
     echo "Copying opencode config to ~/.config/opencode/ (no-clobber)..."
     mkdir -p ~/.config/opencode
-    # -n preserves any local opencode.json / weave-opencode.json the user has
-    # already created (those files are gitignored — see README "Post-Installation
-    # Authentication" for how to set them up).
+    # -n preserves any local opencode.json the user has already created.
     cp -rn .config/opencode/. ~/.config/opencode/
-    copy_if_missing "$HOME/.config/opencode/opencode.json.template" "$HOME/.config/opencode/opencode.json"
-    copy_if_missing "$HOME/.config/opencode/weave-opencode.json.template" "$HOME/.config/opencode/weave-opencode.json"
 }
 
 check_opencode_provider() {
@@ -739,6 +757,57 @@ run_p10k_configure() {
     fi
 }
 
+# Symlink a repo path into $HOME, backing up any real file/dir already there.
+link_path() {
+    local src="$(pwd -P)/$1"
+    local dest="$2"
+    mkdir -p "$(dirname "$dest")"
+
+    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
+        echo "  [skipped] $dest already links to $src"
+        return 0
+    fi
+    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+        local backup="$dest.pre-dotfiles-backup-$(date +%Y%m%d%H%M%S)"
+        echo "  [backup] existing $dest -> $backup"
+        mv "$dest" "$backup"
+    fi
+    ln -sfn "$src" "$dest"
+    echo "  [linked] $dest -> $src"
+}
+
+# Claude Code, Codex and shared agent skills: instructions/skills are symlinked,
+# settings are seeded once from templates (they hold per-machine state).
+link_agent_configs() {
+    echo ""
+    echo "Linking Claude Code / Codex agent config..."
+
+    link_path .config/claude/CLAUDE.md "$HOME/.claude/CLAUDE.md"
+    link_path .config/codex/AGENTS.md "$HOME/.codex/AGENTS.md"
+    link_path .config/codex/keybindings.json "$HOME/.codex/keybindings.json"
+    for skill in .config/codex/skills/*/; do
+        link_path "${skill%/}" "$HOME/.codex/skills/$(basename "$skill")"
+    done
+    for skill in .agents/skills/*/; do
+        link_path "${skill%/}" "$HOME/.agents/skills/$(basename "$skill")"
+    done
+    copy_if_missing .config/claude/settings.json.template "$HOME/.claude/settings.json"
+    copy_if_missing .config/codex/config.toml.template "$HOME/.codex/config.toml"
+
+    if command -v npm &> /dev/null; then
+        echo "Building caveman MCP..."
+        (cd mcp/caveman && npm install --silent)
+        if command -v claude &> /dev/null && ! claude mcp get caveman &> /dev/null; then
+            claude mcp add caveman --scope user -- node "$(pwd -P)/mcp/caveman/dist/index.js"
+        fi
+    fi
+}
+
+if [[ "$1" == "--agents-only" || "$1" == "--claude-only" ]]; then
+    link_agent_configs
+    exit 0
+fi
+
 check_and_switch_to_zsh
 
 prompt_optional_packages
@@ -758,6 +827,8 @@ setup_ohmyzsh
 setup_powerlevel10k
 
 copy_dotfiles
+
+link_agent_configs
 
 check_opencode_provider
 
