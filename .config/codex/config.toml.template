@@ -68,3 +68,18 @@ hide_rate_limit_model_nudge = true
 
 [browser_use.origins."https://www.meshy.ai"]
 access = "allow"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
+
+[mcp_servers.basic-memory]
+command = "__HOME__/.local/bin/basic-memory"
+args = ["mcp"]
+
+[mcp_servers.caveman]
+command = "node"
+args = ["__HOME__/dotfiles/mcp/caveman/dist/index.js"]
+
+[mcp_servers.ecmwf]
+url = "https://mcp.ecmwf.int"

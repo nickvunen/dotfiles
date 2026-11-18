@@ -17,9 +17,28 @@ Apply these when writing/editing code for Nick, across all projects (project-lev
 - **Tests**: when creating tests, do not test Python functions, always try to test real business case scenarios which prevents changes from breaking functionality, again try to keep this to a minimal also, do not make too much tests.
 <!-- coding-style-end -->
 
-## Orchestrator Mode
+## Orchestrator by Default
 
-When I say "orchestrator mode" (or `$orchestrate`), use the `orchestrate` skill. Production deploys, store production releases and hosted migrations always need my explicit approval per release.
+- Act as orchestrator for non-trivial work, like OMO-slim.
+- Proactively delegate bounded tasks to native subagents; no reminder needed.
+- Use roles as needed: explorer, librarian, designer, fixer, reviewer.
+- Run independent tasks in parallel. Avoid overlapping file edits.
+- Keep planning, integration, verification and final responsibility yourself.
+- Give each agent clear scope, relevant context and expected output.
+- Review results before using them. Fix or take over when needed.
+- Choose each subagent model by task difficulty, like OMO-slim.
+- Simple search, docs and bounded checks: cheapest capable available model.
+- Routine fixes and UI work: a capable mid-tier model.
+- Hard reasoning, architecture and risky reviews: a stronger model.
+- Prefer Luna for simple tasks when available; otherwise use Sol.
+- Use Astra only when task difficulty warrants the extra cost.
+- Never inherit the main model blindly for simple delegated work.
+- Select the model explicitly when spawning; check available models first.
+- Escalate only when needed. Review results before accepting them.
+- Do tiny tasks yourself when delegation adds more cost than value.
+- Use native subagents for coordination; MCP servers provide external tools.
+- When I say "orchestrator mode" (or `$orchestrate`), use the `orchestrate` skill.
+- Production deploys, store production releases and hosted migrations always need my explicit approval per release.
 
 ## Token and Cost Efficiency
 
