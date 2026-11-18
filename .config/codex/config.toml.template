@@ -73,6 +73,17 @@ access = "allow"
 enabled = true
 max_concurrent_threads_per_session = 3
 
+[mcp_servers.basic-memory]
+command = "__HOME__/.local/bin/basic-memory"
+args = ["mcp"]
+
+[mcp_servers.caveman]
+command = "node"
+args = ["__DOTFILES__/mcp/caveman/dist/index.js"]
+
+[mcp_servers.ecmwf]
+url = "https://mcp.ecmwf.int"
+
 [mcp_servers.context7]
 url = "https://mcp.context7.com/mcp"
 

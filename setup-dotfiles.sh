@@ -600,11 +600,18 @@ copy_if_missing() {
     fi
     if [ -e "$dest" ]; then
         echo "  [skipped] $dest (already exists)"
-    elif sed "s|__HOME__|$HOME|g" "$src" > "$dest"; then
-        echo "  [created] $dest"
     else
-        echo "  [ERROR] failed to copy $src -> $dest"
-        return 1
+        local home_path checkout_path
+        home_path=$(printf '%s' "$HOME" | sed 's/[\\&|]/\\&/g')
+        checkout_path=$(pwd -P | sed 's/[\\&|]/\\&/g')
+        if ! sed \
+            -e "s|__DOTFILES__|$checkout_path|g" \
+            -e "s|{env:HOME}/dotfiles/mcp/caveman/|$checkout_path/mcp/caveman/|g" \
+            -e "s|__HOME__|$home_path|g" "$src" > "$dest"; then
+            echo "  [ERROR] failed to copy $src -> $dest"
+            return 1
+        fi
+        echo "  [created] $dest"
     fi
 }
 
@@ -712,7 +719,7 @@ copy_dotfiles() {
 
     echo "Copying opencode config to ~/.config/opencode/ (no-clobber)..."
     mkdir -p ~/.config/opencode
-    # -n preserves any local opencode.json the user has already created.
+    copy_if_missing .config/opencode/opencode.json ~/.config/opencode/opencode.json
     cp -rn .config/opencode/. ~/.config/opencode/
 }
 
@@ -783,12 +790,8 @@ link_agent_configs() {
     echo "Linking Claude Code / Codex agent config..."
 
     link_path .config/claude/CLAUDE.md "$HOME/.claude/CLAUDE.md"
-    for file in .config/claude/agents/*.md; do
-        link_path "$file" "$HOME/.claude/agents/$(basename "$file")"
-    done
-    for file in .config/claude/commands/*.md; do
-        link_path "$file" "$HOME/.claude/commands/$(basename "$file")"
-    done
+    link_path .config/claude/agents "$HOME/.claude/agents"
+    link_path .config/claude/commands "$HOME/.claude/commands"
     link_path .config/codex/AGENTS.md "$HOME/.codex/AGENTS.md"
     link_path .config/codex/keybindings.json "$HOME/.codex/keybindings.json"
     for skill in .config/codex/skills/*/; do

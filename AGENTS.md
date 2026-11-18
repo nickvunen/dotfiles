@@ -20,10 +20,10 @@ Mapping (see `copy_dotfiles()` in `setup-dotfiles.sh`):
 | `.config/zshrc/` | `~/.config/zshrc/` (sourced from `~/.zshrc`) | `copy_config_dir` |
 | `.config/yazi/` | `~/.config/yazi/` | plain `cp -r` |
 | `.config/thefuck/` | `~/.config/thefuck/` | plain `cp -r` |
-| `.config/opencode/` | `~/.config/opencode/` | `cp -rn` (**no-clobber**) |
-| `.config/claude/CLAUDE.md` | `~/.claude/CLAUDE.md` | **symlink** (`link_path`) |
+| `.config/opencode/` | `~/.config/opencode/` | Seed config with checkout path, then `cp -rn` |
+| `.config/claude/CLAUDE.md`, `agents/`, `commands/` | `~/.claude/…` | **symlink** (`link_path`) |
 | `.config/codex/AGENTS.md`, `keybindings.json`, `skills/*` | `~/.codex/…` | **symlink** (`link_path`) |
-| `.agents/skills/*` | `~/.agents/skills/…` | **symlink** (`link_path`) |
+| `.agents/skills/*` | `~/.agents/skills/…` and `~/.claude/skills/…` | **symlink** (`link_path`) |
 | `.config/claude/settings.json.template` | `~/.claude/settings.json` | `copy_if_missing` |
 | `.config/codex/config.toml.template` | `~/.codex/config.toml` | `copy_if_missing` (`__HOME__` → `$HOME`) |
 
@@ -55,7 +55,8 @@ Copy-helper rules worth knowing before touching them:
 
 - `.config/opencode/AGENTS.md` is the user's **global** instruction file (C-3PO persona, memory rules, MR/ticket workflows). It is loaded in every opencode session, including sessions in this repo. Changing it changes agent behaviour everywhere, so treat edits as high-impact.
 - Tracked: `opencode.json`, `AGENTS.md`, `cli.json`, `oh-my-opencode-slim.json`, `commands/`.
-- Caveman style comes from `mcp/caveman/` (MCP server `instructions`), registered in `opencode.json` and via `claude mcp add`. Codex does not preload MCP instructions, so the same rules live in `.config/codex/AGENTS.md` — keep both in sync.
+- Shared MCP servers (caveman, basic-memory, ecmwf, context7, gh_grep) are listed in `opencode.json` and registered for Claude Code and Codex by `register_agent_mcps` in `setup-dotfiles.sh` (skips existing ones). Add a new MCP in both places.
+- Caveman style comes from `mcp/caveman/` (MCP server `instructions`). Codex does not preload MCP instructions, so the same rules live in `.config/codex/AGENTS.md` — keep both in sync.
 - Nested ignore file `.config/opencode/.gitignore` hides runtime/secret files: `node_modules`, `package.json`, `package-lock.json`, `bun.lock`, `.gitignore` itself, `service.json`. Root `.gitignore` additionally drops `weave-opencode.json`, `*.bak`, and app state that tools write into `.config/` (`acli/`, `configstore/`, `opencode-mobile/`, …).
 - Plugin dependencies (`@opencode-ai/plugin`) are installed outside this repo's history and the setup script does not install them. Don't add a build/install step expecting it to exist.
 
@@ -76,7 +77,7 @@ The README's `## Keyboard Shortcuts` section is the authoritative user-facing re
 
 ## Do not rely on the pre-commit hook
 
-`.git/hooks/pre-commit` is a stale install from another project (hard-coded `/Users/nickvanunen/Geoweb-backend/.../python3.11`) and passes `--skip-on-missing-config`. There is no `.pre-commit-config.yaml` here, so it is a no-op. Do not assume hooks enforce anything.
+A local pre-commit hook may exist. This repo has no `.pre-commit-config.yaml`.
 
 ## Commit style
 

@@ -48,7 +48,7 @@
       "type": "local",
       "command": [
         "node",
-        "/Users/nickvanunen/dotfiles/mcp/caveman/dist/index.js"
+        "{env:HOME}/dotfiles/mcp/caveman/dist/index.js"
       ],
       "enabled": true
     },

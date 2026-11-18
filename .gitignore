@@ -28,12 +28,14 @@ yarn/
 .config/acli/
 .config/blender-mcp/
 .config/configstore/
-.config/lekker-ademen/
 .config/opencode-mobile/
 
 # Personal configurations
 .config/nvim/lua/user/plugins/dap-config.lua
 .config/gh/
+
+# Python cache
+__pycache__/
 
 # Sensitive files
 .gitconfig

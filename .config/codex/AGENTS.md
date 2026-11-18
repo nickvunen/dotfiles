@@ -2,9 +2,9 @@ Be sweet and friendly. Please keep it short and to the point. Say as much as pos
 
 <!-- coding-style-begin -->
 
-## Nick's Coding Style Preferences
+## Coding Style Preferences
 
-Apply these when writing/editing code for Nick, across all projects (project-level lint config always wins on formatting specifics):
+Apply these when writing/editing code across all projects (project-level lint config always wins on formatting specifics):
 
 - **Readability**: top priority, always. Optimize for other devs (and AIs) understanding intent fast — clear structure, obvious flow, no cleverness for its own sake.
 - **Compact**: try to keep the total lines of code low, do not make excessive classes or functions, no fluff, check what is truly needed and create it with keeping readability in highest regard.
@@ -12,7 +12,7 @@ Apply these when writing/editing code for Nick, across all projects (project-lev
 - **Comments**: minimal. Only explain _why_ for non-obvious/tricky logic. Never restate what code does. Keep any comment as short as possible.
 - **Naming**: scope-dependent — terse (`i`, `tmp`) OK in tight local scopes/loops; descriptive full words for anything module-level, function names, public APIs.
 - **Function/file size**: small, single-purpose. Split when a function/file does more than one thing.
-- **Error handling**: explicit typed errors/exceptions, not silent failure or bare exceptions. (Matches this repo's `crud/errors.py` pattern: typed errors raised in logic layers, mapped to HTTP at the boundary.)
+- **Error handling**: explicit typed errors/exceptions, not silent failure or bare exceptions.
 - **Formatting/tooling**: trust the linter/formatter fully (yapf/isort/pylint/mypy here, or project equivalent elsewhere). No manual overrides against what the tool enforces.
 - **Tests**: when creating tests, do not test Python functions, always try to test real business case scenarios which prevents changes from breaking functionality, again try to keep this to a minimal also, do not make too much tests.
 <!-- coding-style-end -->
