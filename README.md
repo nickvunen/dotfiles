@@ -47,8 +47,8 @@ The `setup-dotfiles.sh` script performs the following actions:
    - `.config/yazi/` → `~/.config/yazi/`
    - `.config/thefuck/` → `~/.config/thefuck/`
    - `.config/opencode/` → `~/.config/opencode/` (no-clobber — preserves your local `opencode.json`)
-   - Claude Code / Codex: `CLAUDE.md`, `AGENTS.md`, keybindings and skills are **symlinked** into `~/.claude`, `~/.codex` and `~/.agents`; `settings.json` / `config.toml` are seeded once from templates
-   - `mcp/caveman/` is built and registered as a Claude Code MCP server
+   - Claude Code / Codex: `CLAUDE.md`, `AGENTS.md`, Claude agents/commands, keybindings and skills are **symlinked** into `~/.claude`, `~/.codex` and `~/.agents`; `settings.json` / `config.toml` are seeded once from templates
+   - MCP servers are registered for Claude Code and Codex, preserving existing entries: caveman (built locally), basic-memory (when installed), ECMWF, Context7 and grep.app
 9. **Adds source lines** to `~/.zshrc` for extra configurations
 10. **Launches the Powerlevel10k configuration wizard** for prompt customization
 
@@ -493,9 +493,9 @@ The repository includes the following configuration files:
 | `.config/yazi/` | Yazi file manager configuration |
 | `.config/thefuck/` | thefuck configuration |
 | `.config/opencode/` | opencode AI agent config — `opencode.json`, global `AGENTS.md`, commands, oh-my-opencode-slim presets |
-| `.config/claude/` | Claude Code — global `CLAUDE.md` (symlinked) and `settings.json.template` |
+| `.config/claude/` | Claude Code — global `CLAUDE.md`, agents and commands (symlinked), plus `settings.json.template` |
 | `.config/codex/` | Codex — global `AGENTS.md`, keybindings, skills (symlinked) and `config.toml.template` |
-| `.agents/skills/` | Skills shared by Claude Code and Codex (symlinked into `~/.agents/skills/`) |
+| `.agents/skills/` | Skills shared by Claude Code and Codex (symlinked into `~/.agents/skills/` and `~/.claude/skills/`) |
 | `mcp/caveman/` | MCP server that makes agents answer short and plain (caveman style) |
 
 ## Optional: Debug Adapter Protocol (DAP) Configuration

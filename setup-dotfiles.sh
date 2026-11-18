@@ -783,6 +783,12 @@ link_agent_configs() {
     echo "Linking Claude Code / Codex agent config..."
 
     link_path .config/claude/CLAUDE.md "$HOME/.claude/CLAUDE.md"
+    for file in .config/claude/agents/*.md; do
+        link_path "$file" "$HOME/.claude/agents/$(basename "$file")"
+    done
+    for file in .config/claude/commands/*.md; do
+        link_path "$file" "$HOME/.claude/commands/$(basename "$file")"
+    done
     link_path .config/codex/AGENTS.md "$HOME/.codex/AGENTS.md"
     link_path .config/codex/keybindings.json "$HOME/.codex/keybindings.json"
     for skill in .config/codex/skills/*/; do
@@ -790,17 +796,44 @@ link_agent_configs() {
     done
     for skill in .agents/skills/*/; do
         link_path "${skill%/}" "$HOME/.agents/skills/$(basename "$skill")"
+        link_path "${skill%/}" "$HOME/.claude/skills/$(basename "$skill")"
     done
     copy_if_missing .config/claude/settings.json.template "$HOME/.claude/settings.json"
     copy_if_missing .config/codex/config.toml.template "$HOME/.codex/config.toml"
 
+    register_agent_mcps
+}
+
+# Register one MCP server in Claude Code and Codex (user scope), skipping existing ones.
+# Usage: register_mcp <name> --url <url>  |  register_mcp <name> -- <command> [args...]
+register_mcp() {
+    local name="$1"; shift
+    if command -v claude &> /dev/null && ! claude mcp get "$name" &> /dev/null; then
+        if [ "$1" = "--url" ]; then
+            claude mcp add --scope user --transport http "$name" "$2"
+        else
+            claude mcp add --scope user "$name" "$@"
+        fi
+    fi
+    if command -v codex &> /dev/null && ! codex mcp get "$name" &> /dev/null; then
+        codex mcp add "$name" "$@"
+    fi
+}
+
+# Shared MCP servers; Context7 and grep.app match the OMO-slim librarian tools.
+register_agent_mcps() {
+    echo "Registering agent MCP servers..."
     if command -v npm &> /dev/null; then
         echo "Building caveman MCP..."
         (cd mcp/caveman && npm install --silent)
-        if command -v claude &> /dev/null && ! claude mcp get caveman &> /dev/null; then
-            claude mcp add caveman --scope user -- node "$(pwd -P)/mcp/caveman/dist/index.js"
-        fi
+        register_mcp caveman -- node "$(pwd -P)/mcp/caveman/dist/index.js"
     fi
+    if command -v basic-memory &> /dev/null; then
+        register_mcp basic-memory -- basic-memory mcp
+    fi
+    register_mcp ecmwf --url https://mcp.ecmwf.int
+    register_mcp context7 --url https://mcp.context7.com/mcp
+    register_mcp gh_grep --url https://mcp.grep.app
 }
 
 if [[ "$1" == "--agents-only" || "$1" == "--claude-only" ]]; then
